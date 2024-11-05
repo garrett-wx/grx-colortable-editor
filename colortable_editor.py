@@ -475,9 +475,41 @@ class ColorTableApp:
                     self.step_entry.delete(0, tk.END)
                     self.step_entry.insert(0, rest)
                 elif key in ('solidcolor', 'solidcolor4'):
-                    # Handle solid colors
-                    # [Existing code remains unchanged]
-                    pass
+                    # Handle SolidColor and SolidColor4
+                    parts = rest.split()
+                    value_num = parts[0]
+
+                    try:
+                        if key == 'solidcolor':
+                            # SolidColor: value R G B
+                            if len(parts) != 4:
+                                raise ValueError(f"Invalid SolidColor format: {rest}")
+                            r, g, b = map(int, parts[1:4])
+                            hex_color = "#{:02x}{:02x}{:02x}".format(r, g, b)
+                            color_band = {
+                                'type': 'solid',
+                                'start_color': hex_color,
+                                'format': 'rgb'
+                            }
+                        elif key == 'solidcolor4':
+                            # SolidColor4: value R G B A
+                            if len(parts) != 5:
+                                raise ValueError(f"Invalid SolidColor4 format: {rest}")
+                            r, g, b, a = map(int, parts[1:5])
+                            hex_color = "#{:02x}{:02x}{:02x}".format(r, g, b)
+                            color_band = {
+                                'type': 'solid',
+                                'start_color': hex_color,
+                                'start_alpha': a,
+                                'format': 'rgba'
+                            }
+                        else:
+                            continue  # Skip unknown keys
+
+                        self.create_color_entry(value=value_num, color_band=color_band)
+                    except ValueError as e:
+                        print(f"Error parsing line '{line}': {e}")
+                        continue
                 elif key in ('color', 'color4'):
                     parts = rest.split()
                     value_num = parts[0]
