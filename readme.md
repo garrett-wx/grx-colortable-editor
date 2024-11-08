@@ -88,3 +88,7 @@ Color: 30 0 0 255 255 255 0
 Color4: 40 255 255 0 128 0 0 255 128
 
 RF: 255 255 255
+
+
+## License
+This software is open-source and free to use for educational or non-commercial purposes. Contact Garrett Helms for additional licensing information.
