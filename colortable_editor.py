@@ -2,6 +2,11 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, simpledialog
 from tkinter.colorchooser import askcolor
 import re
+import pyautogui
+from PIL import ImageGrab
+import threading
+import time
+from pynput import mouse
 
 class ColorTableApp:
     def __init__(self, root):
@@ -21,10 +26,11 @@ class ColorTableApp:
         menubar.add_cascade(label="File", menu=file_menu)
         self.root.config(menu=menubar)
 
-        # Product and unit settings
+        # Product, Units, Scale, Offset, Step, and RF settings
         frame_settings = ttk.LabelFrame(self.root, text="Settings")
         frame_settings.pack(fill="x", padx=10, pady=5)
 
+        # Row 0: Product and Units
         ttk.Label(frame_settings, text="Product:").grid(row=0, column=0, sticky='e')
         self.product_entry = ttk.Entry(frame_settings, width=15)
         self.product_entry.grid(row=0, column=1, padx=5, pady=5)
@@ -33,6 +39,7 @@ class ColorTableApp:
         self.units_entry = ttk.Entry(frame_settings, width=15)
         self.units_entry.grid(row=0, column=3, padx=5, pady=5)
 
+        # Row 1: Scale and Offset
         ttk.Label(frame_settings, text="Scale:").grid(row=1, column=0, sticky='e')
         self.scale_entry = ttk.Entry(frame_settings, width=15)
         self.scale_entry.grid(row=1, column=1, padx=5, pady=5)
@@ -41,20 +48,36 @@ class ColorTableApp:
         self.offset_entry = ttk.Entry(frame_settings, width=15)
         self.offset_entry.grid(row=1, column=3, padx=5, pady=5)
 
+        # Row 2: Step
         ttk.Label(frame_settings, text="Step:").grid(row=2, column=0, sticky='e')
         self.step_entry = ttk.Entry(frame_settings, width=15)
         self.step_entry.grid(row=2, column=1, padx=5, pady=5)
 
-        # Scrollable frame for color entries
+        # Row 3: RF Color Selector
+        ttk.Label(frame_settings, text="RF:").grid(row=3, column=0, sticky='e')
+        self.rf_color_preview = tk.Label(
+            frame_settings, width=3, background="#FFFFFF",
+            relief="solid", borderwidth=1
+        )
+        self.rf_color_preview.grid(row=3, column=1, padx=5, pady=5)
+
+        self.rf_color_button = ttk.Button(
+            frame_settings, text="Select RF Color", command=self.select_rf_color
+        )
+        self.rf_color_button.grid(row=3, column=2, padx=5, pady=5)
+
+        # Scrollable frame for color entries with both vertical and horizontal scrollbars
         frame_colors = ttk.LabelFrame(self.root, text="Color Entries")
         frame_colors.pack(fill="both", expand=True, padx=10, pady=5)
 
         canvas = tk.Canvas(frame_colors)
         self.scroll_frame = ttk.Frame(canvas)
         scroll_y = ttk.Scrollbar(frame_colors, orient="vertical", command=canvas.yview)
+        scroll_x = ttk.Scrollbar(frame_colors, orient="horizontal", command=canvas.xview)
 
-        canvas.configure(yscrollcommand=scroll_y.set)
+        canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
         scroll_y.pack(side="right", fill="y")
+        scroll_x.pack(side="bottom", fill="x")
         canvas.pack(side="left", fill="both", expand=True)
         canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
 
@@ -74,6 +97,28 @@ class ColorTableApp:
         self.preview_canvas = tk.Canvas(self.root, height=70)  # Increased height
         self.preview_canvas.pack(fill="x", padx=10, pady=5)
 
+    def refresh_color_entries(self):
+        """
+        Sort the color_entries list based on the numeric value in 'value_entry'
+        and re-pack them into the GUI in sorted order.
+        """
+        # Define a helper function to extract the numeric value
+        def get_entry_value(entry):
+            try:
+                return float(entry['value_entry'].get())
+            except ValueError:
+                # Assign a large number to push invalid entries to the end
+                return float('inf')
+        
+        # Sort the color_entries list
+        self.color_entries.sort(key=get_entry_value)
+        
+        # Re-pack the entries in sorted order
+        for entry in self.color_entries:
+            entry['frame'].pack_forget()  # Remove from current position
+        for entry in self.color_entries:
+            entry['frame'].pack(fill="x", pady=2)  # Re-pack in sorted order
+
     def create_color_entry(self, value='', color_band=None):
         """
         Create a color entry in the GUI.
@@ -92,6 +137,10 @@ class ColorTableApp:
         value_entry = ttk.Entry(color_row, width=10)
         value_entry.pack(side="left", padx=5)
         value_entry.insert(0, value)
+        
+        # Bind the value_entry to refresh entries on value change
+        value_entry.bind("<FocusOut>", lambda e: self.refresh_color_entries())
+        value_entry.bind("<Return>", lambda e: self.refresh_color_entries())
 
         # Store the color band info
         color_info = {
@@ -132,6 +181,13 @@ class ColorTableApp:
         )
         start_color_button.pack(side="left", padx=5)
 
+        # Added: Pick Screen Color Button
+        pick_screen_color_button = ttk.Button(
+            color_row, text="Pick Screen Color",
+            command=lambda cp=start_color_preview: self.pick_screen_color(cp, color_format_var)
+        )
+        pick_screen_color_button.pack(side="left", padx=5)
+
         # Initialize 'end_color_preview' and 'end_color_button' as None
         entry = {
             'frame': color_row,
@@ -141,11 +197,15 @@ class ColorTableApp:
             'start_color_preview': start_color_preview,
             'end_color_preview': None,
             'end_color_button': None,
+            'end_pick_screen_color_button': None,  # To handle end color picking
             'color_info': color_info
         }
 
         # Append to color_entries
         self.color_entries.append(entry)
+        
+        # Refresh the entries to sort them
+        self.refresh_color_entries()
 
         def update_band_type(*args):
             band_type = band_type_var.get().lower()
@@ -168,18 +228,28 @@ class ColorTableApp:
                     )
                     end_color_button.pack(side="left", padx=5)
 
+                    # Add Pick Screen Color Button for End Color
+                    end_pick_screen_color_button = ttk.Button(
+                        color_row, text="Pick Screen Color",
+                        command=lambda cp=end_color_preview: self.pick_screen_color(cp, color_format_var)
+                    )
+                    end_pick_screen_color_button.pack(side="left", padx=5)
+
                     # Store in entry
                     entry['end_color_preview'] = end_color_preview
                     entry['end_color_button'] = end_color_button
+                    entry['end_pick_screen_color_button'] = end_pick_screen_color_button
                 else:
                     # Widgets already exist; make sure they're visible
                     entry['end_color_preview'].pack(side="left", padx=5)
                     entry['end_color_button'].pack(side="left", padx=5)
+                    entry['end_pick_screen_color_button'].pack(side="left", padx=5)
             else:
                 # Hide end color widgets
                 if entry['end_color_preview'] is not None:
                     entry['end_color_preview'].pack_forget()
                     entry['end_color_button'].pack_forget()
+                    entry['end_pick_screen_color_button'].pack_forget()
 
             # Update color_info
             color_info['type'] = band_type
@@ -212,6 +282,10 @@ class ColorTableApp:
                 color_row.destroy()
                 self.color_entries.remove(entry)
                 break
+        
+        # Refresh the entries to sort them
+        self.refresh_color_entries()
+
 
     def select_color(self, color_preview, color_format_var):
         # Get the current color value of the color preview label
@@ -236,6 +310,64 @@ class ColorTableApp:
                 color_preview.config(background=color)
                 color_preview.color_value = color
                 color_preview.alpha_value = 255  # Default alpha
+
+    def pick_screen_color(self, color_preview, color_format_var):
+        """
+        Allows the user to pick a color from anywhere on the screen via a mouse click.
+        """
+        # Minimize the main window to allow the user to see the screen
+        self.root.withdraw()
+        time.sleep(0.2)  # Wait for the window to minimize
+
+        # Inform the user
+        messagebox.showinfo("Pick Color", "After clicking OK, click anywhere on the primary screen to select a color.")
+
+        # Function to handle the mouse click
+        def on_click(x, y, button, pressed):
+            if pressed:
+                try:
+                    # Get the primary screen size
+                    screen_width, screen_height = pyautogui.size()
+                    
+                    # Check if the click is within the primary screen
+                    if x < 0 or y < 0 or x > screen_width or y > screen_height:
+                        messagebox.showerror("Invalid Selection", "Selected position is outside the primary monitor.")
+                        self.root.deiconify()  # Restore the main window
+                        return False  # Stop listener
+
+                    # Get the color of the pixel at the clicked position
+                    screenshot = ImageGrab.grab()
+                    selected_color = screenshot.getpixel((x, y))
+                    
+                    # Update the color preview
+                    if selected_color:
+                        hex_color = "#{:02x}{:02x}{:02x}".format(*selected_color[:3])
+                        self.root.deiconify()  # Restore the main window
+                        self.root.lift()        # Bring it to the front
+                        color_preview.config(background=hex_color)
+                        color_preview.color_value = hex_color
+                        if color_format_var.get().lower() == 'rgba':
+                            # Handle alpha if available
+                            alpha = selected_color[3] if len(selected_color) > 3 else 255
+                            color_preview.alpha_value = alpha
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to capture color: {e}")
+                finally:
+                    self.root.deiconify()  # Ensure the window is restored
+                # Stop the listener after one click
+                return False
+
+        # Start the mouse listener in a separate thread
+        listener = mouse.Listener(on_click=on_click)
+        listener.start()
+
+    def select_rf_color(self):
+        # Get the current RF color
+        current_color = self.rf_color_preview['background']
+        # Open the color chooser
+        color = askcolor(color=current_color)[1]
+        if color:
+            self.rf_color_preview.config(background=color)
 
     def preview_color_table(self):
         self.preview_canvas.delete("all")
@@ -336,6 +468,11 @@ class ColorTableApp:
                 label = f"{tick_value} {units}"
                 self.preview_canvas.create_text(x, 55, text=label, anchor='n', font=('Arial', 8))
 
+        # Optional: Display RF Color in Preview Canvas (e.g., as a separate indicator)
+            rf_color = self.rf_color_preview['background']
+            self.preview_canvas.create_rectangle(margin, 50, margin + 20, 60, fill=rf_color, outline="black")
+            self.preview_canvas.create_text(margin + 30, 55, text="RF Color", anchor='w', font=('Arial', 8))
+
     def open_color_table(self):
         file_path = filedialog.askopenfilename(
             filetypes=[("Color Table Files", "*.txt *.pal *.pal3 *.pal3.txt"), ("All Files", "*.*")]
@@ -349,6 +486,9 @@ class ColorTableApp:
                 for entry in self.color_entries:
                     entry['frame'].destroy()
                 self.color_entries.clear()
+
+                # Reset RF color to default
+                self.rf_color_preview.config(background="#FFFFFF")
 
                 # Remove comments and empty lines
                 lines = [line.strip() for line in content.splitlines() if line.strip() and not line.strip().startswith((';', '#', '//'))]
@@ -406,6 +546,20 @@ class ColorTableApp:
                         value = value_match.group(1)
                         color_band = self.parse_color_band(rest)
                         self.create_color_entry(value=value, color_band=color_band)
+                elif key == 'rf':
+                    # Handle RF Field
+                    rgb = rest.split()
+                    if len(rgb) == 3:
+                        try:
+                            r, g, b = map(int, rgb)
+                            # Validate RGB values
+                            if all(0 <= val <= 255 for val in (r, g, b)):
+                                hex_color = "#{:02x}{:02x}{:02x}".format(r, g, b)
+                                self.rf_color_preview.config(background=hex_color)
+                            else:
+                                raise ValueError("RGB values must be between 0 and 255.")
+                        except ValueError as ve:
+                            print(f"Error parsing RF line: {ve}")
                 # Additional keys like Decimals, ND, RF, Label can be added here if needed
 
     def parse_color_band(self, rest):
@@ -568,8 +722,19 @@ class ColorTableApp:
                         print(f"Error parsing line '{line}': {e}")
                         continue
                 elif key == 'rf':
-                    # Handle RF color if needed
-                    pass
+                    # Handle RF Field in Legacy Format
+                    rgb = rest.split()
+                    if len(rgb) == 3:
+                        try:
+                            r, g, b = map(int, rgb)
+                            # Validate RGB values
+                            if all(0 <= val <= 255 for val in (r, g, b)):
+                                hex_color = "#{:02x}{:02x}{:02x}".format(r, g, b)
+                                self.rf_color_preview.config(background=hex_color)
+                            else:
+                                raise ValueError("RGB values must be between 0 and 255.")
+                        except ValueError as ve:
+                            print(f"Error parsing RF line: {ve}")
                 else:
                     continue
             else:
@@ -618,7 +783,7 @@ class ColorTableApp:
                                 'color_format': color_format
                             })
 
-                    # Sort entries by value
+                    # Sort entries by value in descending order
                     entries.sort(key=lambda x: x['value'], reverse=True)
 
                     for i, entry in enumerate(entries):
@@ -667,6 +832,12 @@ class ColorTableApp:
                                 # Color without RGB2
                                 rgb_str = ' '.join(map(str, start_rgb[:3]))
                                 file.write(f"Color: {value} {rgb_str}\n")
+
+                    # Write RF Line at the End
+                    rf_hex = self.rf_color_preview['background']
+                    rf_rgb = self.hex_to_rgb(rf_hex)
+                    file.write(f"\nRF: {rf_rgb[0]} {rf_rgb[1]} {rf_rgb[2]}\n")
+
                 messagebox.showinfo("Save Successful", "Color table saved successfully.")
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to save color table: {e}")
