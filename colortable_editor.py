@@ -8,6 +8,7 @@ import threading
 import time
 from pynput import mouse
 
+
 class ColorTableApp:
     def __init__(self, root):
         self.root = root
@@ -97,6 +98,15 @@ class ColorTableApp:
         self.preview_canvas = tk.Canvas(self.root, height=70)  # Increased height
         self.preview_canvas.pack(fill="x", padx=10, pady=5)
 
+    def clean_line(self, line):
+        """
+        Remove any content following a ';' and trim whitespace.
+        """
+        line = line.strip()
+        if ';' in line:
+            line = line.split(';', 1)[0].strip()
+        return line
+
     def refresh_color_entries(self):
         """
         Sort the color_entries list based on the numeric value in 'value_entry'
@@ -109,10 +119,10 @@ class ColorTableApp:
             except ValueError:
                 # Assign a large number to push invalid entries to the end
                 return float('inf')
-        
+
         # Sort the color_entries list
         self.color_entries.sort(key=get_entry_value)
-        
+
         # Re-pack the entries in sorted order
         for entry in self.color_entries:
             entry['frame'].pack_forget()  # Remove from current position
@@ -137,7 +147,7 @@ class ColorTableApp:
         value_entry = ttk.Entry(color_row, width=10)
         value_entry.pack(side="left", padx=5)
         value_entry.insert(0, value)
-        
+
         # Bind the value_entry to refresh entries on value change
         value_entry.bind("<FocusOut>", lambda e: self.refresh_color_entries())
         value_entry.bind("<Return>", lambda e: self.refresh_color_entries())
@@ -181,7 +191,7 @@ class ColorTableApp:
         )
         start_color_button.pack(side="left", padx=5)
 
-        # Added: Pick Screen Color Button
+        # Pick Screen Color Button
         pick_screen_color_button = ttk.Button(
             color_row, text="Pick Screen Color",
             command=lambda cp=start_color_preview: self.pick_screen_color(cp, color_format_var)
@@ -203,7 +213,7 @@ class ColorTableApp:
 
         # Append to color_entries
         self.color_entries.append(entry)
-        
+
         # Refresh the entries to sort them
         self.refresh_color_entries()
 
@@ -282,10 +292,9 @@ class ColorTableApp:
                 color_row.destroy()
                 self.color_entries.remove(entry)
                 break
-        
+
         # Refresh the entries to sort them
         self.refresh_color_entries()
-
 
     def select_color(self, color_preview, color_format_var):
         # Get the current color value of the color preview label
@@ -328,7 +337,7 @@ class ColorTableApp:
                 try:
                     # Get the primary screen size
                     screen_width, screen_height = pyautogui.size()
-                    
+
                     # Check if the click is within the primary screen
                     if x < 0 or y < 0 or x > screen_width or y > screen_height:
                         messagebox.showerror("Invalid Selection", "Selected position is outside the primary monitor.")
@@ -338,7 +347,7 @@ class ColorTableApp:
                     # Get the color of the pixel at the clicked position
                     screenshot = ImageGrab.grab()
                     selected_color = screenshot.getpixel((x, y))
-                    
+
                     # Update the color preview
                     if selected_color:
                         hex_color = "#{:02x}{:02x}{:02x}".format(*selected_color[:3])
@@ -427,8 +436,8 @@ class ColorTableApp:
 
                 if color_info['type'] == 'gradient' and color_info['end_color']:
                     # Draw gradient between start_color and end_color
-                    steps = int(x1 - x0) if x1 - x0 > 0 else 1
-                    for j in range(int(steps)):
+                    steps = max(int(x1 - x0), 1)
+                    for j in range(steps):
                         ratio = j / steps
                         start_rgb = self.hex_to_rgb(color_info['start_color'])
                         end_rgb = self.hex_to_rgb(color_info['end_color'])
@@ -446,8 +455,10 @@ class ColorTableApp:
             step_value = self.step_entry.get()
             try:
                 step = float(step_value)
+                if step <= 0:
+                    raise ValueError
             except ValueError:
-                step = (max_val - min_val) / 5  # Default to dividing into 5 steps if Step is invalid
+                step = (max_val - min_val) / 5 if (max_val - min_val) != 0 else 1  # Default to dividing into 5 steps if Step is invalid
 
             units = self.units_entry.get().strip()
             if not units:
@@ -463,12 +474,15 @@ class ColorTableApp:
                 tick_values.append(max_val)
 
             for tick_value in tick_values:
-                x = margin + (tick_value - min_val) / (max_val - min_val) * width
+                if max_val - min_val == 0:
+                    x = margin + width / 2
+                else:
+                    x = margin + (tick_value - min_val) / (max_val - min_val) * width
                 self.preview_canvas.create_line(x, 40, x, 45, fill='black')
                 label = f"{tick_value} {units}"
                 self.preview_canvas.create_text(x, 55, text=label, anchor='n', font=('Arial', 8))
 
-        # Optional: Display RF Color in Preview Canvas (e.g., as a separate indicator)
+            # Optional: Display RF Color in Preview Canvas (e.g., as a separate indicator)
             rf_color = self.rf_color_preview['background']
             self.preview_canvas.create_rectangle(margin, 50, margin + 20, 60, fill=rf_color, outline="black")
             self.preview_canvas.create_text(margin + 30, 55, text="RF Color", anchor='w', font=('Arial', 8))
@@ -490,15 +504,24 @@ class ColorTableApp:
                 # Reset RF color to default
                 self.rf_color_preview.config(background="#FFFFFF")
 
-                # Remove comments and empty lines
-                lines = [line.strip() for line in content.splitlines() if line.strip() and not line.strip().startswith((';', '#', '//'))]
+                # Process lines to handle inline comments
+                lines = content.splitlines()
+                cleaned_lines = []
+                for line in lines:
+                    line = self.clean_line(line)
+                    if not line:
+                        continue  # Skip empty lines
+                    # Skip lines that start with other comment indicators
+                    if line.startswith(('#', '//')):
+                        continue
+                    cleaned_lines.append(line)
 
                 # Check for ColorTable block
-                if lines and 'colortable' in lines[0].lower():
-                    self.parse_colortable_block(lines)
+                if cleaned_lines and 'colortable' in cleaned_lines[0].lower():
+                    self.parse_colortable_block(cleaned_lines)
                 else:
                     # Legacy parsing for older formats
-                    self.parse_legacy_format(lines)
+                    self.parse_legacy_format(cleaned_lines)
 
                 messagebox.showinfo("Color Table Loaded", "Color table loaded successfully.")
 
@@ -516,9 +539,9 @@ class ColorTableApp:
 
         # Parse block content line by line
         for line in block_content.split('\n'):
-            line = line.strip()
-            if not line or line.startswith((';', '#', '//')):
-                continue  # Skip comments and empty lines
+            line = self.clean_line(line)
+            if not line:
+                continue  # Skip empty lines
 
             if '=' in line:
                 key, rest = line.split('=', 1)
@@ -560,7 +583,7 @@ class ColorTableApp:
                                 raise ValueError("RGB values must be between 0 and 255.")
                         except ValueError as ve:
                             print(f"Error parsing RF line: {ve}")
-                # Additional keys like Decimals, ND, RF, Label can be added here if needed
+                # Additional keys like Decimals, ND, Label can be handled here if needed
 
     def parse_color_band(self, rest):
         rest = rest.strip()
@@ -631,6 +654,8 @@ class ColorTableApp:
                 elif key in ('solidcolor', 'solidcolor4'):
                     # Handle SolidColor and SolidColor4
                     parts = rest.split()
+                    if not parts:
+                        continue
                     value_num = parts[0]
 
                     try:
@@ -666,6 +691,8 @@ class ColorTableApp:
                         continue
                 elif key in ('color', 'color4'):
                     parts = rest.split()
+                    if not parts:
+                        continue
                     value_num = parts[0]
 
                     # Initialize default alpha values
@@ -750,22 +777,22 @@ class ColorTableApp:
                 with open(file_path, 'w') as file:
                     file.write(f"Product: {self.product_entry.get()}\n")
                     file.write(f"Units: {self.units_entry.get()}\n")
-                    
+
                     # Check if Scale field is not empty before writing
                     scale_value = self.scale_entry.get()
                     if scale_value.strip():
                         file.write(f"Scale: {scale_value}\n")
-                    
+
                     # Check if Offset field is not empty before writing
                     offset_value = self.offset_entry.get()
                     if offset_value.strip():
                         file.write(f"Offset: {offset_value}\n")
-                    
+
                     # Check if Step field is not empty before writing
                     step_value = self.step_entry.get()
                     if step_value.strip():
                         file.write(f"Step: {step_value}\n")
-                    
+
                     file.write("\n")
 
                     entries = []
@@ -813,7 +840,7 @@ class ColorTableApp:
                                 rgb_str = ' '.join(map(str, start_rgb[:3]))
                                 file.write(f"SolidColor: {value} {rgb_str}\n")
                         elif band_type == 'gradient':
-                            if color_format == 'rgba':
+                            if color_format == 'rgba' and end_rgb:
                                 # Color4 with RGBA2
                                 start_rgb_str = ' '.join(map(str, start_rgb))
                                 end_rgb_str = ' '.join(map(str, end_rgb))
@@ -821,7 +848,7 @@ class ColorTableApp:
                             else:
                                 # Color with RGB2
                                 start_rgb_str = ' '.join(map(str, start_rgb[:3]))
-                                end_rgb_str = ' '.join(map(str, end_rgb[:3]))
+                                end_rgb_str = ' '.join(map(str, end_rgb[:3])) if end_rgb else ' '.join(map(str, start_rgb[:3]))
                                 file.write(f"Color: {value} {start_rgb_str} {end_rgb_str}\n")
                         else:
                             if color_format == 'rgba':
@@ -844,12 +871,15 @@ class ColorTableApp:
 
     def hex_to_rgb(self, hex_color, alpha=255):
         hex_color = hex_color.lstrip('#')
+        if len(hex_color) != 6:
+            raise ValueError(f"Invalid hex color: {hex_color}")
         rgb = tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
         return rgb + (alpha,)
 
     def rgb_list_from_hex(self, hex_color, alpha=255):
         rgb = self.hex_to_rgb(hex_color, alpha)
         return list(rgb)
+
 
 # Run the application
 if __name__ == "__main__":
