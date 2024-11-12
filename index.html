@@ -593,8 +593,6 @@ Author: Garrett Helms
 
   function removeEntry(id) {
     saveState(); // Save state before making changes
-    if (!confirm('Are you sure you want to remove this entry?')) return;
-    
     // Find the entry DOM element
     const entryDiv = document.querySelector(`.color-entry[data-id='${id}']`);
     if (entryDiv) {
