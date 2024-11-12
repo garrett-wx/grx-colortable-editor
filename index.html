@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color Table Creator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+/*
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+
+Copyright (c) 2024 Garrett Helms
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, and modify the Software, provided that the following conditions are met:
+
+1. **Non-Commercial Use Only**: The Software may be used only for non-commercial purposes. Redistribution, sublicensing, and/or modification of this Software for commercial gain is strictly prohibited.
+
+2. **Attribution and Integrity**: The name "Garrett Helms," aliases including "Garrett H.," must not be removed from this notice, any part of the Software, its documentation, or the Software's user interface. This includes social media links added for the author's profiles, which must remain in the footer as-is, unaltered. All copies, modifications, or substantial portions of the Software must include this copyright notice and attribution.
+
+3. **No Removal of Identifiers**: Alteration or removal of the author’s name, aliases, associated identifiers, or social media links is strictly prohibited in any copies, forks, redistributions, or modified versions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author: Garrett Helms
+*/
+
+    body { font-family: Arial, sans-serif; background-color: #f9f9f9; }
+    .container { 
+      max-width: 1200px; 
+      margin: 20px auto; 
+      padding: 20px; 
+      background-color: #fff; 
+      border: 1px solid #ccc; 
+      border-radius: 8px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+      animation: fadeIn 1s ease-out;
+    }
+    h1, h2 { text-align: center; }
+    .settings, .preview, .buttons {
+      margin-top: 25px; padding: 15px; border: 1px solid #ddd; border-radius: 6px; background-color: #fafafa;
+    }
+    .form-group { display: flex; align-items: center; margin: 8px 0; }
+    .form-group label { width: 120px; font-weight: bold; }
+    .form-group input, .form-group select { flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+    .color-entries {
+      margin-top: 25px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .entries-list {
+      flex: 1 1 60%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fafafa;
+      margin-right: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .entry-form {
+      flex: 1 1 35%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+    .color-entry { 
+      display: flex; align-items: center; margin-top: 10px; padding: 10px; border: 1px solid #eee; border-radius: 6px; background-color: #fff; 
+      animation: slideIn 0.5s ease-out;
+      transition: background-color 0.5s;
+    }
+    .color-entry > div { margin-right: 10px; }
+    .color-entry input[type="color"] { width: 40px; height: 40px; padding: 0; border: none; }
+    .color-entry input[type="number"] { width: 80px; }
+    .color-entry select { width: 140px; }
+    .color-entry button { padding: 6px 12px; border: none; background-color: #e74c3c; color: #fff; border-radius: 4px; cursor: pointer; margin-left: 5px; }
+    .color-entry button:hover { background-color: #c0392b; }
+    .color-entry .edit-btn { background-color: #3498db; }
+    .color-entry .edit-btn:hover { background-color: #2980b9; }
+    .color-entry .duplicate-btn { background-color: #2ecc71; }
+    .color-entry .duplicate-btn:hover { background-color: #27ae60; }
+    .color-entry .handle { cursor: grab; padding: 0 10px; }
+    .preview-canvas { width: 100%; height: 100px; border: 1px solid #ccc; border-radius: 4px; position: relative; cursor: pointer; }
+    .preview-container { position: relative; }
+    .marker { position: absolute; top: 0; font-size: 12px; color: #000; text-align: center; transform: translateX(-50%); }
+    .buttons button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+    .buttons button.save { background-color: #2c3e50; color: #fff; }
+    .buttons button.save:hover { background-color: #1a252f; }
+    .buttons button.load { background-color: #f39c12; color: #fff; }
+    .buttons button.load:hover { background-color: #d35400; }
+    .buttons button.undo { background-color: #e67e22; color: #fff; }
+    .buttons button.undo:hover { background-color: #d35400; }
+    .footer { text-align: center; margin-top: 40px; font-size: 0.9em; color: #666; }
+    .social-icons {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .social-icons a {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .social-icons a svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+    .social-icons a:hover {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @keyframes highlight {
+      from { background-color: #ffffcc; }
+      to { background-color: #fff; }
+    }
+    .fade-out {
+      animation: fadeOut 0.5s forwards;
+    }
+    .highlight {
+      animation: highlight 1s ease-out;
+    }
+    /* Highlight Class for Clicked Entries */
+    .highlight-scroll {
+      animation: highlight 1s ease-out;
+      border: 2px solid #3498db;
+    }
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: #ffffff;
+    }
+    body.dark-mode .container {
+      background-color: #1e1e1e;
+      border-color: #333;
+      box-shadow: 0 2px 8px rgba(255,255,255,0.1);
+    }
+    body.dark-mode input, body.dark-mode select {
+      background-color: #2b2b2b;
+      color: #fff;
+      border-color: #444;
+    }
+    body.dark-mode .settings, 
+    body.dark-mode .color-entries, 
+    body.dark-mode .preview, 
+    body.dark-mode .buttons,
+    body.dark-mode .entries-list,
+    body.dark-mode .entry-form {
+      background-color: #1e1e1e;
+      border-color: #333;
+    }
+    body.dark-mode .preview-canvas {
+      border-color: #444;
+    }
+    body.dark-mode .form-group label {
+      color: #ccc;
+    }
+    body.dark-mode .color-entry {
+      background-color: #2b2b2b;
+      border-color: #444;
+    }
+    body.dark-mode .color-entry button {
+      background-color: #444;
+    }
+    body.dark-mode .color-entry button:hover {
+      background-color: #555;
+    }
+    body.dark-mode .footer {
+      color: #999;
+    }
+    body.dark-mode .social-icons a svg {
+      fill: #fff;
+    }
+    /* Responsive Design */
+    @media (max-width: 800px) {
+      .color-entries {
+        flex-direction: column;
+      }
+      .entries-list, .entry-form {
+        flex: 1 1 100%;
+        margin-right: 0;
+        margin-top: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Color Table Creator</h1>
+
+  <!-- Settings Section -->
+  <div class="settings">
+    <h2>Settings</h2>
+    <div class="form-group">
+      <label for="product">Product:</label>
+      <input type="text" id="product" placeholder="Enter product name">
+    </div>
+    <div class="form-group">
+      <label for="units">Units:</label>
+      <input type="text" id="units" placeholder="Enter units">
+    </div>
+    <div class="form-group">
+      <label for="scale">Scale:</label>
+      <input type="number" id="scale" step="0.01" placeholder="Enter scale">
+    </div>
+    <div class="form-group">
+      <label for="offset">Offset:</label>
+      <input type="number" id="offset" step="0.01" placeholder="Enter offset">
+    </div>
+    <div class="form-group">
+      <label for="step">Step:</label>
+      <input type="number" id="step" step="0.01" placeholder="Enter step">
+    </div>
+    <div class="form-group">
+      <label for="rfColor">RF Color:</label>
+      <input type="color" id="rfColor" value="#404040">
+    </div>
+    <!-- Filename Input -->
+    <div class="form-group">
+      <label for="filename">Filename:</label>
+      <input type="text" id="filename" placeholder="Enter filename" value="color_table.pal">
+    </div>
+    <!-- Dark Mode Toggle -->
+    <div class="form-group">
+      <label for="darkMode">Dark Mode:</label>
+      <input type="checkbox" id="darkMode">
+    </div>
+  </div>
+
+  <!-- Color Entries Section -->
+  <div class="color-entries">
+    <!-- Entries List -->
+    <div class="entries-list">
+      <h2>Color Entries</h2>
+      <button onclick="openAddForm()" style="padding: 8px 16px; background-color: #2980b9; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+        Add Color
+      </button>
+      <div id="entriesContainer"></div>
+    </div>
+
+    <!-- Entry Form -->
+    <div class="entry-form" id="entryFormContainer" style="display: none;">
+      <h2 id="formTitle">Add Color Entry</h2>
+      <div class="form-group">
+        <label for="entryType">Type:</label>
+        <select id="entryType" onchange="toggleEntryFields()">
+          <option value="SolidColor">SolidColor</option>
+          <option value="SolidColor4">SolidColor4</option>
+          <option value="Color">Color</option>
+          <option value="Color4">Color4</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="entryValue">Value:</label>
+        <input type="number" id="entryValue" step="0.01" placeholder="Enter value">
+      </div>
+      <div class="form-group">
+        <label for="startColor">Start Color:</label>
+        <input type="color" id="startColor" value="#ffffff">
+      </div>
+      <div class="form-group" id="startAlphaGroup" style="display: none;">
+        <label for="startAlpha">Start Alpha:</label>
+        <input type="number" id="startAlpha" step="0.01" min="0" max="1" value="1">
+      </div>
+      <div class="form-group" id="endColorGroup" style="display: none;">
+        <label for="endColor">End Color:</label>
+        <input type="color" id="endColor" value="#ffffff">
+      </div>
+      <div class="form-group" id="endAlphaGroup" style="display: none;">
+        <label for="endAlpha">End Alpha:</label>
+        <input type="number" id="endAlpha" step="0.01" min="0" max="1" value="1">
+      </div>
+      <button onclick="saveEntry()" style="padding: 8px 16px; background-color: #27ae60; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+        Save
+      </button>
+      <button onclick="cancelEdit()" style="padding: 8px 16px; background-color: #e74c3c; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Preview Section -->
+  <div class="preview">
+    <h2>Preview</h2>
+    <div class="preview-container">
+      <canvas id="previewCanvas" class="preview-canvas"></canvas>
+      <div id="markersContainer"></div>
+    </div>
+  </div>
+
+  <!-- Buttons for Save, Load, and Undo -->
+  <div class="buttons">
+    <button class="save" onclick="saveColorTable()">Save Color Table</button>
+    <button class="load" onclick="loadColorTable()">Load Color Table</button>
+    <button class="undo" onclick="undo()">Undo</button>
+  </div>
+</div>
+
+<!-- Footer with Social Media Icons -->
+<div class="footer">
+  &copy; 2024 Garrett Helms. All rights reserved.
+  <div class="social-icons">
+    <a href="https://x.com/WxGareBear" target="_blank" aria-label="Twitter/X">
+      <!-- Twitter/X SVG Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1DA1F2">
+        <path d="M23.954 4.569c-.885.392-1.83.656-2.825.775 
+          1.014-.609 1.794-1.574 2.163-2.723
+          -.95.555-2.005.959-3.127 1.184
+          -.897-.957-2.178-1.555-3.594-1.555
+          -2.717 0-4.92 2.203-4.92 4.917 
+          0 .39.045.765.127 1.124 
+          -4.087-.205-7.713-2.164-10.141-5.144 
+          -.424.722-.666 1.561-.666 2.475 
+          0 1.708.87 3.213 2.188 4.096 
+          -.807-.026-1.566-.248-2.228-.616 
+          v.061c0 2.385 1.693 4.374 3.946 4.827 
+          -.413.111-.849.171-1.296.171 
+          -.314 0-.615-.03-.916-.086 
+          .631 1.953 2.445 3.377 4.6 3.419 
+          -1.68 1.319-3.809 2.105-6.102 2.105 
+          -.39 0-.779-.023-1.17-.067 
+          2.179 1.397 4.768 2.213 7.557 2.213 
+          9.054 0 14-7.496 14-13.986 
+          0-.21 0-.423-.015-.637 
+          .961-.689 1.8-1.56 2.46-2.548 
+          l-.047-.02z"/>
+      </svg>
+    </a>
+    <a href="https://github.com/garrett-wx" target="_blank" aria-label="GitHub">
+      <!-- GitHub SVG Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#333">
+        <path d="M12 .5C5.73.5.5 5.73.5 12 
+          c0 5.08 3.29 9.4 7.86 10.94 
+          .58.11.79-.25.79-.56 
+          0-.28-.01-1.02-.02-2 
+          -3.2.7-3.88-1.54-3.88-1.54 
+          -.53-1.35-1.3-1.71-1.3-1.71 
+          -1.06-.73.08-.72.08-.72 
+          1.17.08 1.79 1.2 1.79 1.2 
+          1.04 1.78 2.73 1.27 3.4.97 
+          .11-.75.41-1.27.75-1.56 
+          -2.55-.29-5.23-1.28-5.23-5.7 
+          0-1.26.45-2.29 1.19-3.1 
+          -.12-.29-.52-1.46.11-3.04 
+          0 0 .97-.31 3.18 1.18 
+          a11.04 11.04 0 012.9-.39 
+          c.98 0 1.96.13 2.9.39 
+          2.2-1.49 3.17-1.18 3.17-1.18 
+          .63 1.58.23 2.75.11 3.04 
+          .75.81 1.19 1.84 1.19 3.1 
+          0 4.43-2.68 5.4-5.24 5.68 
+          .42.36.8 1.08.8 2.19 
+          0 1.58-.01 2.86-.01 3.25 
+          0 .31.21.68.8.56 
+          A11.52 11.52 0 0023.5 12 
+          c0-6.27-5.23-11.5-11.5-11.5z"/>
+      </svg>
+    </a>
+    <a href="https://instagram.com/garrett.helms05" target="_blank" aria-label="Instagram">
+      <!-- Instagram SVG Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#E1306C">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 
+          1.366.062 2.633.344 3.608 1.32 
+          .975.976 1.258 2.242 1.32 3.608 
+          .058 1.266.07 1.646.07 4.85 
+          s-.012 3.584-.07 4.85 
+          c-.062 1.366-.344 2.633-1.32 3.608 
+          -.976.975-2.242 1.258-3.608 1.32 
+          -1.266.058-1.646.07-4.85.07 
+          s-3.584-.012-4.85-.07 
+          c-1.366-.062-2.633-.344-3.608-1.32 
+          -.975-.976-1.258-2.242-1.32-3.608 
+          C2.175 15.747 2.163 15.367 2.163 12 
+          s.012-3.584.07-4.85 
+          c.062-1.366.344-2.633 1.32-3.608 
+          .976-.975 2.242-1.258 3.608-1.32 
+          C8.416 2.175 8.796 2.163 12 2.163 
+          zm0-2.163C8.741 0 8.332.013 7.052.072 
+          5.771.13 4.667.375 3.723 1.319 
+          c-.944.944-1.19 2.048-1.248 3.329 
+          C2.013 5.668 2 6.077 2 9.333 
+          v5.334c0 3.256.013 3.665.072 4.945 
+          .058 1.281.304 2.385 1.248 3.329 
+          .944.944 2.048 1.19 3.329 1.248 
+          1.28.059 1.689.072 4.945.072 
+          s3.665-.013 4.945-.072 
+          c1.281-.058 2.385-.304 3.329-1.248 
+          .944-.944 1.19-2.048 1.248-3.329 
+          .059-1.28.072-1.689.072-4.945 
+          V9.333c0-3.256-.013-3.665-.072-4.945 
+          -.058-1.281-.304-2.385-1.248-3.329 
+          -.944-.944-2.048-1.19-3.329-1.248 
+          C15.665.013 15.256 0 12 0 
+          zm0 5.838a6.162 6.162 0 100 12.324 
+          6.162 6.162 0 000-12.324 
+          zm0 10.162a3.999 3.999 0 110-7.998 
+          3.999 3.999 0 010 7.998 
+          zm6.406-11.845a1.44 1.44 0 11-2.88 0 
+          1.44 1.44 0 012.88 0z"/>
+      </svg>
+    </a>
+    <a href="https://wxtools.org" target="_blank" aria-label="WxTools">
+      <img src="https://lh3.googleusercontent.com/drive-storage/AJQWtBPXWHraoKcTeoK94Kt02AHjokQJ0B4y1dAFQbSkQic8c3H7gUUfbrH7Jk2pfeDlOu-E5Mhk2Z0NbLM7c_Safehkr02YOxrs_n4r-coN39pAY4A=w1237-h884" alt="WxTools Logo" width="24" height="24" />
+    </a>
+  </div>
+</div>
+
+<script>
+  let colorEntries = [];
+  let editingEntryId = null;
+  let undoStack = [];
+
+  // Entry Form Controls
+  const entryFormContainer = document.getElementById('entryFormContainer');
+  const formTitle = document.getElementById('formTitle');
+  const entryTypeSelect = document.getElementById('entryType');
+  const startAlphaGroup = document.getElementById('startAlphaGroup');
+  const endColorGroup = document.getElementById('endColorGroup');
+  const endAlphaGroup = document.getElementById('endAlphaGroup');
+
+  function openAddForm() {
+    editingEntryId = null;
+    formTitle.textContent = 'Add Color Entry';
+    entryTypeSelect.value = 'SolidColor';
+    document.getElementById('entryValue').value = '';
+    document.getElementById('startColor').value = '#ffffff';
+    document.getElementById('startAlpha').value = '1';
+    document.getElementById('endColor').value = '#ffffff';
+    document.getElementById('endAlpha').value = '1';
+    toggleEntryFields();
+    entryFormContainer.style.display = 'block';
+  }
+
+  function openEditForm(id) {
+    const entry = colorEntries.find(e => e.id === id);
+    if (!entry) return;
+
+    editingEntryId = id;
+    formTitle.textContent = 'Edit Color Entry';
+    entryTypeSelect.value = entry.type;
+    document.getElementById('entryValue').value = entry.value;
+    document.getElementById('startColor').value = entry.startColor;
+    document.getElementById('startAlpha').value = entry.alpha;
+    document.getElementById('endColor').value = entry.endColor || '#ffffff';
+    document.getElementById('endAlpha').value = entry.endAlpha || '1';
+    toggleEntryFields();
+    entryFormContainer.style.display = 'block';
+
+    // Scroll to the form
+    entryFormContainer.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    entryFormContainer.style.display = 'none';
+    editingEntryId = null;
+  }
+
+  // Toggle visibility of alpha and end color fields based on type
+  function toggleEntryFields() {
+    const type = entryTypeSelect.value;
+    if (type.endsWith('4')) {
+      startAlphaGroup.style.display = 'flex';
+      if (type.startsWith('Color')) {
+        endColorGroup.style.display = 'flex';
+        endAlphaGroup.style.display = 'flex';
+      } else {
+        endColorGroup.style.display = 'none';
+        endAlphaGroup.style.display = 'none';
+      }
+    } else {
+      startAlphaGroup.style.display = 'none';
+      if (type.startsWith('Color')) {
+        endColorGroup.style.display = 'flex';
+      } else {
+        endColorGroup.style.display = 'none';
+      }
+      endAlphaGroup.style.display = 'none';
+    }
+  }
+
+  function saveState() {
+    const state = {
+      colorEntries: JSON.parse(JSON.stringify(colorEntries)),
+      settings: {
+        product: document.getElementById('product').value,
+        units: document.getElementById('units').value,
+        scale: document.getElementById('scale').value,
+        offset: document.getElementById('offset').value,
+        step: document.getElementById('step').value,
+        rfColor: document.getElementById('rfColor').value,
+        filename: document.getElementById('filename').value,
+        darkMode: document.getElementById('darkMode').checked
+      }
+    };
+    undoStack.push(state);
+  }
+
+  function saveEntry() {
+    saveState(); // Save state before making changes
+    const type = entryTypeSelect.value;
+    const value = parseFloat(document.getElementById('entryValue').value);
+    const startColor = document.getElementById('startColor').value;
+    const alpha = type.endsWith('4') ? parseFloat(document.getElementById('startAlpha').value) : 1;
+    const endColor = (type.startsWith('Color') && document.getElementById('endColor').value !== '#ffffff') ? document.getElementById('endColor').value : null;
+    const endAlpha = (type === 'Color4' || type === 'Color') ? parseFloat(document.getElementById('endAlpha').value) : 1;
+
+    // Basic validation
+    if (isNaN(value)) {
+      alert('Please enter a valid value.');
+      return;
+    }
+    if (type.endsWith('4')) {
+      if (isNaN(alpha) || alpha < 0 || alpha > 1) {
+        alert('Start Alpha must be between 0 and 1.');
+        return;
+      }
+      if (type === 'Color4' && (isNaN(endAlpha) || endAlpha < 0 || endAlpha > 1)) {
+        alert('End Alpha must be between 0 and 1.');
+        return;
+      }
+    }
+
+    if (editingEntryId !== null) {
+      // Update existing entry
+      const entryIndex = colorEntries.findIndex(e => e.id === editingEntryId);
+      if (entryIndex !== -1) {
+        colorEntries[entryIndex] = {
+          id: editingEntryId,
+          type,
+          value,
+          startColor,
+          alpha,
+          endColor,
+          endAlpha
+        };
+      }
+    } else {
+      // Add new entry
+      const newId = colorEntries.length > 0 ? Math.max(...colorEntries.map(e => e.id)) + 1 : 0;
+      colorEntries.push({
+        id: newId,
+        type,
+        value,
+        startColor,
+        alpha,
+        endColor,
+        endAlpha
+      });
+    }
+
+    renderEntries();
+    updatePreview();
+    cancelEdit();
+
+    // Highlight the edited entry if applicable
+    if (editingEntryId !== null) {
+      const editedEntryDiv = document.querySelector(`.color-entry[data-id='${editingEntryId}']`);
+      if (editedEntryDiv) {
+        editedEntryDiv.classList.add('highlight');
+        setTimeout(() => {
+          editedEntryDiv.classList.remove('highlight');
+        }, 1000);
+      }
+    }
+  }
+
+  function duplicateEntry(id) {
+    saveState(); // Save state before making changes
+    const entry = colorEntries.find(e => e.id === id);
+    if (!entry) return;
+    const newId = colorEntries.length > 0 ? Math.max(...colorEntries.map(e => e.id)) + 1 : 0;
+    const duplicatedEntry = { ...entry, id: newId };
+    colorEntries.push(duplicatedEntry);
+    renderEntries();
+    updatePreview();
+  }
+
+  function removeEntry(id) {
+    saveState(); // Save state before making changes
+    if (!confirm('Are you sure you want to remove this entry?')) return;
+    
+    // Find the entry DOM element
+    const entryDiv = document.querySelector(`.color-entry[data-id='${id}']`);
+    if (entryDiv) {
+      // Add fade-out animation
+      entryDiv.classList.add('fade-out');
+      // Wait for the animation to finish before removing
+      entryDiv.addEventListener('animationend', () => {
+        colorEntries = colorEntries.filter(e => e.id !== id);
+        renderEntries();
+        updatePreview();
+      }, { once: true });
+    } else {
+      // If not found, remove immediately
+      colorEntries = colorEntries.filter(e => e.id !== id);
+      renderEntries();
+      updatePreview();
+    }
+  }
+
+  // Undo Functionality
+  function undo() {
+    if (undoStack.length > 0) {
+      const prevState = undoStack.pop();
+      colorEntries = prevState.colorEntries;
+      document.getElementById('product').value = prevState.settings.product;
+      document.getElementById('units').value = prevState.settings.units;
+      document.getElementById('scale').value = prevState.settings.scale;
+      document.getElementById('offset').value = prevState.settings.offset;
+      document.getElementById('step').value = prevState.settings.step;
+      document.getElementById('rfColor').value = prevState.settings.rfColor;
+      document.getElementById('filename').value = prevState.settings.filename;
+      document.getElementById('darkMode').checked = prevState.settings.darkMode;
+      if (prevState.settings.darkMode) {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+
+      renderEntries();
+      updatePreview();
+    } else {
+      alert('Nothing to undo.');
+    }
+  }
+
+  // Keyboard Shortcut for Undo (Ctrl + Z)
+  document.addEventListener('keydown', function(event) {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+      event.preventDefault();
+      undo();
+    }
+  });
+
+  // Drag and Drop Reordering
+  let dragSrcEl = null;
+
+  function handleDragStart(e) {
+    dragSrcEl = this;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
+    this.style.opacity = '0.4';
+  }
+
+  function handleDragOver(e) {
+    if (e.preventDefault) e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+  }
+
+  function handleDrop(e) {
+    if (e.stopPropagation) e.stopPropagation();
+
+    if (dragSrcEl !== this) {
+      saveState(); // Save state before making changes
+      const srcId = parseInt(dragSrcEl.getAttribute('data-id'));
+      const tgtId = parseInt(this.getAttribute('data-id'));
+
+      const srcIndex = colorEntries.findIndex(e => e.id === srcId);
+      const tgtIndex = colorEntries.findIndex(e => e.id === tgtId);
+
+      // Swap the entries
+      [colorEntries[srcIndex], colorEntries[tgtIndex]] = [colorEntries[tgtIndex], colorEntries[srcIndex]];
+      renderEntries();
+      updatePreview();
+    }
+    return false;
+  }
+
+  function handleDragEnd() {
+    this.style.opacity = '1';
+  }
+
+  function addDragAndDropHandlers(entryDiv) {
+    entryDiv.setAttribute('draggable', 'true');
+    entryDiv.addEventListener('dragstart', handleDragStart, false);
+    entryDiv.addEventListener('dragover', handleDragOver, false);
+    entryDiv.addEventListener('drop', handleDrop, false);
+    entryDiv.addEventListener('dragend', handleDragEnd, false);
+  }
+
+  // Dark Mode Toggle
+  document.getElementById('darkMode').addEventListener('change', function() {
+    saveState(); // Save state before making changes
+    if (this.checked) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  });
+
+  // Render Color Entries with Inline Editing and Hover Effects
+  function renderEntries() {
+    const container = document.getElementById('entriesContainer');
+    container.innerHTML = '';
+
+    colorEntries.sort((a, b) => a.value - b.value); // Sort by value
+
+    colorEntries.forEach(entry => {
+      const entryDiv = document.createElement('div');
+      entryDiv.classList.add('color-entry');
+      entryDiv.setAttribute('data-id', entry.id);
+
+      // Drag Handle
+      const handleDiv = document.createElement('div');
+      handleDiv.classList.add('handle');
+      handleDiv.innerHTML = '☰';
+      entryDiv.appendChild(handleDiv);
+
+      // Value Display with Inline Editing
+      const valueDiv = document.createElement('div');
+      const valueLabel = document.createElement('span');
+      valueLabel.textContent = 'Value: ';
+      const valueInput = document.createElement('input');
+      valueInput.type = 'number';
+      valueInput.step = '0.01';
+      valueInput.value = entry.value;
+      valueInput.style.width = '80px';
+      valueInput.onchange = function() {
+        saveState(); // Save state before making changes
+        entry.value = parseFloat(valueInput.value);
+        renderEntries();
+        updatePreview();
+      };
+      valueDiv.appendChild(valueLabel);
+      valueDiv.appendChild(valueInput);
+      entryDiv.appendChild(valueDiv);
+
+      // Start Color Display with Inline Editing
+      const startColorDiv = document.createElement('div');
+      const startColorLabel = document.createElement('span');
+      startColorLabel.textContent = 'Start: ';
+      const startColorSwatch = document.createElement('input');
+      startColorSwatch.type = 'color';
+      startColorSwatch.value = entry.startColor;
+      startColorSwatch.title = `RGB: ${hexToRgb(entry.startColor).r}, ${hexToRgb(entry.startColor).g}, ${hexToRgb(entry.startColor).b}`;
+      startColorSwatch.oninput = function() {
+        saveState(); // Save state before making changes
+        entry.startColor = startColorSwatch.value;
+        updatePreview();
+      };
+      startColorDiv.appendChild(startColorLabel);
+      startColorDiv.appendChild(startColorSwatch);
+      entryDiv.appendChild(startColorDiv);
+
+      // Start Alpha Display with Inline Editing
+      const startAlphaDiv = document.createElement('div');
+      if (entry.type.endsWith('4')) {
+        const startAlphaLabel = document.createElement('span');
+        startAlphaLabel.textContent = 'Start Alpha: ';
+        const startAlphaInput = document.createElement('input');
+        startAlphaInput.type = 'number';
+        startAlphaInput.step = '0.01';
+        startAlphaInput.min = '0';
+        startAlphaInput.max = '1';
+        startAlphaInput.value = entry.alpha;
+        startAlphaInput.style.width = '50px';
+        startAlphaInput.onchange = function() {
+          saveState(); // Save state before making changes
+          entry.alpha = parseFloat(startAlphaInput.value);
+          updatePreview();
+        };
+        startAlphaDiv.appendChild(startAlphaLabel);
+        startAlphaDiv.appendChild(startAlphaInput);
+      }
+      entryDiv.appendChild(startAlphaDiv);
+
+      // End Color Display with Inline Editing (if applicable)
+      if (entry.endColor) {
+        const endColorDiv = document.createElement('div');
+        const endColorLabel = document.createElement('span');
+        endColorLabel.textContent = 'End: ';
+        const endColorSwatch = document.createElement('input');
+        endColorSwatch.type = 'color';
+        endColorSwatch.value = entry.endColor;
+        endColorSwatch.title = `RGB: ${hexToRgb(entry.endColor).r}, ${hexToRgb(entry.endColor).g}, ${hexToRgb(entry.endColor).b}`;
+        endColorSwatch.oninput = function() {
+          saveState(); // Save state before making changes
+          entry.endColor = endColorSwatch.value;
+          updatePreview();
+        };
+        endColorDiv.appendChild(endColorLabel);
+        endColorDiv.appendChild(endColorSwatch);
+        entryDiv.appendChild(endColorDiv);
+
+        // End Alpha Display with Inline Editing
+        const endAlphaDiv = document.createElement('div');
+        if (entry.type.endsWith('4')) {
+          const endAlphaLabel = document.createElement('span');
+          endAlphaLabel.textContent = 'End Alpha: ';
+          const endAlphaInput = document.createElement('input');
+          endAlphaInput.type = 'number';
+          endAlphaInput.step = '0.01';
+          endAlphaInput.min = '0';
+          endAlphaInput.max = '1';
+          endAlphaInput.value = entry.endAlpha;
+          endAlphaInput.style.width = '50px';
+          endAlphaInput.onchange = function() {
+            saveState(); // Save state before making changes
+            entry.endAlpha = parseFloat(endAlphaInput.value);
+            updatePreview();
+          };
+          endAlphaDiv.appendChild(endAlphaLabel);
+          endAlphaDiv.appendChild(endAlphaInput);
+        }
+        entryDiv.appendChild(endAlphaDiv);
+      }
+
+      // Action Buttons
+      const actionsDiv = document.createElement('div');
+      // Edit Button
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'Edit';
+      editBtn.classList.add('edit-btn');
+      editBtn.onclick = () => openEditForm(entry.id);
+      actionsDiv.appendChild(editBtn);
+      // Duplicate Button
+      const duplicateBtn = document.createElement('button');
+      duplicateBtn.textContent = 'Duplicate';
+      duplicateBtn.classList.add('duplicate-btn');
+      duplicateBtn.onclick = () => duplicateEntry(entry.id);
+      actionsDiv.appendChild(duplicateBtn);
+      // Remove Button
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remove';
+      removeBtn.onclick = () => removeEntry(entry.id);
+      actionsDiv.appendChild(removeBtn);
+      entryDiv.appendChild(actionsDiv);
+
+      // Hover Effect to Highlight Preview Segment
+      entryDiv.addEventListener('mouseover', function() {
+        highlightPreviewSegment(entry);
+      });
+      entryDiv.addEventListener('mouseout', function() {
+        updatePreview();
+      });
+
+      // Append drag and drop handlers
+      addDragAndDropHandlers(entryDiv);
+
+      container.appendChild(entryDiv);
+    });
+  }
+
+  // Function to Highlight Preview Segment
+  function highlightPreviewSegment(entry) {
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Redraw the preview
+    updatePreview();
+
+    // Calculate positions
+    const sortedEntries = [...colorEntries].sort((a, b) => a.value - b.value);
+    const minVal = sortedEntries[0].value;
+    const maxVal = sortedEntries[sortedEntries.length - 1].value;
+    const range = maxVal - minVal || 1; // Prevent division by zero
+
+    const xPos = ((entry.value - minVal) / range) * width;
+    const index = sortedEntries.indexOf(entry);
+    const nextEntry = sortedEntries[index + 1];
+    const nextXPos = nextEntry ? ((nextEntry.value - minVal) / range) * width : width;
+
+    // Overlay highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillRect(xPos, 0, nextXPos - xPos, height);
+  }
+
+  // Update Preview Canvas and Markers
+  function updatePreview() {
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = canvas.offsetWidth;
+    const height = canvas.height = canvas.offsetHeight;
+    ctx.clearRect(0, 0, width, height);
+
+    const markersContainer = document.getElementById('markersContainer');
+    markersContainer.innerHTML = ''; // Clear previous markers
+
+    if (colorEntries.length === 0) return;
+
+    // Sort entries by value
+    const sortedEntries = [...colorEntries].sort((a, b) => a.value - b.value);
+    const minVal = sortedEntries[0].value;
+    const maxVal = sortedEntries[sortedEntries.length - 1].value;
+    const range = maxVal - minVal || 1; // Prevent division by zero
+
+    sortedEntries.forEach((entry, index) => {
+      const xPos = ((entry.value - minVal) / range) * width;
+      const nextXPos = index < sortedEntries.length - 1
+        ? ((sortedEntries[index + 1].value - minVal) / range) * width
+        : width;
+
+      if (entry.endColor) {
+        // Create a gradient for this segment
+        const gradient = ctx.createLinearGradient(xPos, 0, nextXPos, 0);
+        gradient.addColorStop(0, rgbaColor(entry.startColor, entry.alpha));
+        gradient.addColorStop(1, rgbaColor(entry.endColor, entry.endAlpha));
+        ctx.fillStyle = gradient;
+      } else {
+        // Fill with solid color
+        ctx.fillStyle = rgbaColor(entry.startColor, entry.alpha);
+      }
+      ctx.fillRect(xPos, 0, nextXPos - xPos, height);
+
+      // Add value markers
+      addValueMarker(entry.value, xPos, width);
+    });
+
+    // Add RF Color overlay
+    const rfColor = document.getElementById('rfColor').value;
+    ctx.fillStyle = rgbaColor(rfColor, 0.3); // Semi-transparent overlay
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  // Function to add value markers on the preview canvas
+  function addValueMarker(value, xPos, canvasWidth) {
+    const markersContainer = document.getElementById('markersContainer');
+
+    // Prevent overlapping markers by setting a minimum distance
+    const minDistance = 50; // Minimum distance in pixels between markers
+    const lastMarker = markersContainer.lastElementChild;
+    if (lastMarker) {
+      const lastX = parseFloat(lastMarker.style.left);
+      if (Math.abs(xPos - lastX) < minDistance) {
+        return;
+      }
+    }
+
+    const markerDiv = document.createElement('div');
+    markerDiv.classList.add('marker');
+    markerDiv.style.left = `${xPos}px`;
+    markerDiv.textContent = value;
+    markersContainer.appendChild(markerDiv);
+  }
+
+  // Convert Hex to RGBA
+  function rgbaColor(hex, alpha) {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  // Helper function to convert hex color to RGB
+  function hexToRgb(hex) {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return { r, g, b };
+  }
+
+  // Save Color Table with Custom Filename
+  function saveColorTable() {
+    const palContent = generatePalContent();
+    const blob = new Blob([palContent], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    const filename = document.getElementById('filename').value || 'color_table.pal';
+    link.download = filename;
+    link.click();
+  }
+
+  // Generate .pal file content from current settings and entries
+  function generatePalContent() {
+    let lines = [];
+
+    // Add comments and headers
+    lines.push('; Generated Color Table with Tools by Garrett Helms');
+    if (document.getElementById('product').value) {
+      lines.push(`Product: ${document.getElementById('product').value}`);
+    }
+    if (document.getElementById('units').value) {
+      lines.push(`Units: ${document.getElementById('units').value}`);
+    }
+    if (document.getElementById('scale').value) {
+      lines.push(`Scale: ${document.getElementById('scale').value}`);
+    }
+    if (document.getElementById('offset').value) {
+      lines.push(`Offset: ${document.getElementById('offset').value}`);
+    }
+    if (document.getElementById('step').value) {
+      lines.push(`Step: ${document.getElementById('step').value}`);
+    }
+    if (document.getElementById('rfColor').value) {
+      const rfColor = hexToRgb(document.getElementById('rfColor').value);
+      lines.push(`RF: ${rfColor.r} ${rfColor.g} ${rfColor.b}`);
+    }
+
+    lines.push(''); // Add an empty line before entries
+
+    // Add color entries
+    colorEntries.sort((a, b) => a.value - b.value); // Ensure entries are sorted by value
+
+    colorEntries.forEach(entry => {
+      let line = `${entry.type}: ${entry.value} `;
+
+      const startRgb = hexToRgb(entry.startColor);
+      line += `${startRgb.r} ${startRgb.g} ${startRgb.b}`;
+
+      if (entry.type.endsWith('4')) {
+        line += ` ${entry.alpha}`;
+      }
+
+      if (entry.endColor) {
+        const endRgb = hexToRgb(entry.endColor || '#FFFFFF');
+        line += ` ${endRgb.r} ${endRgb.g} ${endRgb.b}`;
+
+        if (entry.type.endsWith('4')) {
+          line += ` ${entry.endAlpha}`;
+        }
+      }
+
+      lines.push(line);
+    });
+
+    return lines.join('\n');
+  }
+
+  // Load Color Table from .pal or .txt
+  function loadColorTable() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pal, .txt';
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const fileContent = e.target.result;
+
+        if (file.name.endsWith('.pal') || file.name.endsWith('.txt')) {
+          saveState(); // Save state before making changes
+          loadFromPalData(fileContent);
+        } else {
+          alert('Unsupported file format.');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
+  function loadFromPalData(content) {
+    colorEntries = [];
+    document.getElementById('product').value = '';
+    document.getElementById('units').value = '';
+    document.getElementById('scale').value = '';
+    document.getElementById('offset').value = '';
+    document.getElementById('step').value = '';
+    document.getElementById('rfColor').value = '#404040';
+
+    const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+
+    lines.forEach((line, index) => {
+      // Remove inline comments
+      line = line.split(';')[0].split('//')[0].trim();
+
+      // Skip empty lines after removing comments
+      if (!line) return;
+
+      try {
+        // Use case-insensitive matching
+        if (/^Product:/i.test(line)) {
+          document.getElementById('product').value = line.split(':')[1].trim();
+        } else if (/^Units:/i.test(line)) {
+          document.getElementById('units').value = line.split(':')[1].trim();
+        } else if (/^Scale:/i.test(line)) {
+          document.getElementById('scale').value = parseFloat(line.split(':')[1].trim());
+        } else if (/^Offset:/i.test(line)) {
+          document.getElementById('offset').value = parseFloat(line.split(':')[1].trim());
+        } else if (/^Step:/i.test(line)) {
+          document.getElementById('step').value = parseFloat(line.split(':')[1].trim());
+        } else if (/^RF:/i.test(line)) {
+          const rgb = line.split(':')[1].trim().split(/\s+/).map(Number);
+          if (rgb.length >= 3 && rgb.every(num => !isNaN(num) && num >= 0 && num <= 255)) {
+            document.getElementById('rfColor').value = `#${((1 << 24) | (rgb[0] << 16) | (rgb[1] << 8) | rgb[2]).toString(16).slice(1).toUpperCase()}`;
+          } else {
+            alert(`Invalid RF color values on line ${index + 1}. Expected three integers between 0-255.`);
+          }
+        } else if (/^(SolidColor4|SolidColor|Color4|Color):/i.test(line) || /^[0-9]/.test(line)) {
+          // Handle color lines with or without explicit type
+          parseColorLine(line, index + 1);
+        }
+      } catch (error) {
+        alert(`Error parsing line ${index + 1}: ${line}\n${error.message}`);
+      }
+    });
+
+    renderEntries();
+    updatePreview();
+  }
+
+  function parseColorLine(line, lineNumber) {
+    // Remove inline comments
+    line = line.split(';')[0].split('//')[0].trim();
+
+    // Extract type if present, case-insensitive
+    let typeMatch = line.match(/^(SolidColor4|SolidColor|Color4|Color):/i);
+    let type = typeMatch ? typeMatch[1] : null;
+
+    // Remove type from line if present
+    let contentPart = typeMatch ? line.slice(typeMatch[0].length).trim() : line.trim();
+
+    // Split the content part into tokens
+    const tokens = contentPart.split(/\s+/).map(token => token.trim());
+
+    // Normalize the type to match the expected format (capitalize first letter)
+    if (type) {
+      type = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+    }
+
+    // Determine if the type includes alpha based on '4' suffix
+    let hasAlpha = false;
+    if (type) {
+      hasAlpha = type.endsWith('4');
+    } else {
+      // Infer type based on number of tokens
+      if (tokens.length === 5 || tokens.length === 9) {
+        hasAlpha = true;
+      }
+    }
+
+    // Determine the number of color values to check for gradient
+    const colorValueCount = hasAlpha ? 4 : 3;
+
+    // Determine if it's a gradient based on the number of tokens
+    const isGradient = tokens.length === (1 + colorValueCount * 2);
+
+    // Infer type if not specified
+    if (!type) {
+      if (isGradient) {
+        type = hasAlpha ? 'Color4' : 'Color';
+      } else {
+        type = hasAlpha ? 'SolidColor4' : 'SolidColor';
+      }
+    }
+
+    let value, r1, g1, b1, a1 = 1, r2, g2, b2, a2 = 1;
+    value = parseFloat(tokens[0]);
+
+    r1 = parseInt(tokens[1]);
+    g1 = parseInt(tokens[2]);
+    b1 = parseInt(tokens[3]);
+
+    if (hasAlpha) {
+      a1 = parseFloat(tokens[4]);
+    }
+
+    let idx = 1 + colorValueCount;
+
+    if (isGradient) {
+      r2 = parseInt(tokens[idx]);
+      g2 = parseInt(tokens[idx + 1]);
+      b2 = parseInt(tokens[idx + 2]);
+
+      if (hasAlpha) {
+        a2 = parseFloat(tokens[idx + 3]);
+      }
+    }
+
+    // Validate values
+    if (isNaN(value) || isNaN(r1) || isNaN(g1) || isNaN(b1) || (hasAlpha && isNaN(a1))) {
+      throw new Error(`Invalid values on line ${lineNumber}.`);
+    }
+    if (isGradient && (isNaN(r2) || isNaN(g2) || isNaN(b2) || (hasAlpha && isNaN(a2)))) {
+      throw new Error(`Invalid gradient values on line ${lineNumber}.`);
+    }
+
+    const startColor = `#${((1 << 24) | (r1 << 16) | (g1 << 8) | b1).toString(16).slice(1).toUpperCase()}`;
+    const startAlpha = hasAlpha ? a1 : 1;
+
+    let endColor = null;
+    let endAlpha = 1;
+
+    if (isGradient) {
+      endColor = `#${((1 << 24) | (r2 << 16) | (g2 << 8) | b2).toString(16).slice(1).toUpperCase()}`;
+      endAlpha = hasAlpha ? a2 : 1;
+    }
+
+    const newId = colorEntries.length > 0 ? Math.max(...colorEntries.map(e => e.id)) + 1 : 0;
+
+    colorEntries.push({
+      id: newId,
+      type,
+      value,
+      startColor,
+      alpha: startAlpha,
+      endColor,
+      endAlpha
+    });
+  }
+
+  // Update preview when RF Color changes
+  document.getElementById('rfColor').addEventListener('input', () => {
+    saveState(); // Save state before making changes
+    updatePreview();
+  });
+
+  // Save state when settings change
+  const settingsInputs = ['product', 'units', 'scale', 'offset', 'step', 'filename'];
+  settingsInputs.forEach(id => {
+    document.getElementById(id).addEventListener('change', saveState);
+  });
+
+  // Function to handle clicks on the preview canvas
+  function handlePreviewCanvasClick(event) {
+    const canvas = document.getElementById('previewCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+
+    // Calculate the width and identify the clicked entry
+    const sortedEntries = [...colorEntries].sort((a, b) => a.value - b.value);
+    const minVal = sortedEntries[0].value;
+    const maxVal = sortedEntries[sortedEntries.length - 1].value;
+    const width = canvas.width;
+    const range = maxVal - minVal || 1;
+
+    // Find the entry corresponding to the click position
+    let clickedEntry = null;
+    sortedEntries.some((entry, index) => {
+      const entryXPos = ((entry.value - minVal) / range) * width;
+      const nextEntryXPos = (index < sortedEntries.length - 1)
+        ? ((sortedEntries[index + 1].value - minVal) / range) * width
+        : width;
+
+      if (x >= entryXPos && x <= nextEntryXPos) {
+        clickedEntry = entry;
+        return true;
+      }
+      return false;
+    });
+
+    if (clickedEntry) {
+      // Find and scroll to the color entry element
+      const entryDiv = document.querySelector(`.color-entry[data-id="${clickedEntry.id}"]`);
+      if (entryDiv) {
+        // Remove highlight class from any other entries
+        document.querySelectorAll('.highlight-scroll').forEach(el => el.classList.remove('highlight-scroll'));
+        
+        // Scroll to the clicked entry and highlight it
+        entryDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        entryDiv.classList.add('highlight-scroll');
+        setTimeout(() => entryDiv.classList.remove('highlight-scroll'), 1500);
+      }
+    }
+  }
+
+  // Add event listener for click on the preview canvas
+  document.getElementById('previewCanvas').addEventListener('click', handlePreviewCanvasClick);
+
+  // Initial render and save state
+  renderEntries();
+  updatePreview();
+  saveState();
+</script>
+</body>
+</html>
