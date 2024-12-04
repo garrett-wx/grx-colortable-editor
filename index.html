@@ -883,7 +883,8 @@ Author: Garrett Helms
   }
 
   // Update Preview Canvas and Markers
-  function updatePreview() {
+    // Update Preview Canvas and Markers
+    function updatePreview() {
     const canvas = document.getElementById('previewCanvas');
     const ctx = canvas.getContext('2d');
     const width = canvas.width = canvas.offsetWidth;
@@ -902,22 +903,44 @@ Author: Garrett Helms
     const range = maxVal - minVal || 1; // Prevent division by zero
 
     sortedEntries.forEach((entry, index) => {
-      const xPos = ((entry.value - minVal) / range) * width;
-      const nextXPos = index < sortedEntries.length - 1
+      let xPos = ((entry.value - minVal) / range) * width;
+      let nextXPos = index < sortedEntries.length - 1
         ? ((sortedEntries[index + 1].value - minVal) / range) * width
         : width;
 
+      // Ensure xPos and nextXPos are within canvas boundaries
+      xPos = Math.max(0, Math.min(width, xPos));
+      nextXPos = Math.max(0, Math.min(width, nextXPos));
+
+      // Handle zero-width segments
+      let segmentWidth = nextXPos - xPos;
+      if (segmentWidth < 1) {
+        segmentWidth = 1;
+        if (nextXPos < width) {
+          nextXPos = xPos + segmentWidth;
+        } else {
+          xPos = nextXPos - segmentWidth;
+        }
+      }
+
+      // Improved Gradient Transition
+      let gradient;
       if (entry.endColor) {
-        // Create a gradient for this segment
-        const gradient = ctx.createLinearGradient(xPos, 0, nextXPos, 0);
+        gradient = ctx.createLinearGradient(xPos, 0, nextXPos, 0);
         gradient.addColorStop(0, rgbaColor(entry.startColor, entry.alpha));
         gradient.addColorStop(1, rgbaColor(entry.endColor, entry.endAlpha));
-        ctx.fillStyle = gradient;
+      } else if (index < sortedEntries.length - 1 && sortedEntries[index + 1].startColor) {
+        // If the next entry is a gradient, blend current endColor with next startColor
+        const nextEntry = sortedEntries[index + 1];
+        gradient = ctx.createLinearGradient(xPos, 0, nextXPos, 0);
+        gradient.addColorStop(0, rgbaColor(entry.startColor, entry.alpha));
+        gradient.addColorStop(1, rgbaColor(nextEntry.startColor, nextEntry.alpha));
       } else {
         // Fill with solid color
-        ctx.fillStyle = rgbaColor(entry.startColor, entry.alpha);
+        gradient = rgbaColor(entry.startColor, entry.alpha);
       }
-      ctx.fillRect(xPos, 0, nextXPos - xPos, height);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(xPos, 0, segmentWidth, height);
 
       // Add value markers
       addValueMarker(entry.value, xPos, width);
