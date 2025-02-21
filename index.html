@@ -8,7 +8,7 @@
 /*
 Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) 
 
-Copyright (c) 2024 Garrett Helms
+Copyright (c) 2024-2025 Garrett Helms
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, and modify the Software, provided that the following conditions are met:
 
@@ -256,6 +256,10 @@ Author: Garrett Helms
         Add Color
       </button>
       <div id="entriesContainer"></div>
+      <!-- NEW: Bottom Add Color Button -->
+      <button id="addColorBottom" onclick="openAddForm()" style="padding: 8px 16px; background-color: #2980b9; color: #fff; border: none; border-radius: 4px; cursor: pointer; display: none; margin-top: 10px;">
+        Add Color
+      </button>
     </div>
 
     <!-- Entry Form -->
@@ -318,7 +322,7 @@ Author: Garrett Helms
 
 <!-- Footer with Social Media Icons -->
 <div class="footer">
-  &copy; 2024 Garrett Helms. All rights reserved.
+  &copy; 2024-2025 Garrett Helms. All rights reserved.
   <div class="social-icons">
     <a href="https://x.com/WxGareBear" target="_blank" aria-label="Twitter/X">
       <!-- Twitter/X SVG Icon -->
@@ -854,6 +858,9 @@ Author: Garrett Helms
 
       container.appendChild(entryDiv);
     });
+
+    // Conditionally display the bottom Add Color button if entries exist
+    document.getElementById('addColorBottom').style.display = colorEntries.length > 0 ? 'block' : 'none';
   }
 
   // Function to Highlight Preview Segment
@@ -883,8 +890,7 @@ Author: Garrett Helms
   }
 
   // Update Preview Canvas and Markers
-    // Update Preview Canvas and Markers
-    function updatePreview() {
+  function updatePreview() {
     const canvas = document.getElementById('previewCanvas');
     const ctx = canvas.getContext('2d');
     const width = canvas.width = canvas.offsetWidth;
