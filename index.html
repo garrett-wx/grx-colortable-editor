@@ -16,312 +16,706 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 2. **Attribution and Integrity**: The name "Garrett Helms," aliases including "Garrett H.," must not be removed from this notice, any part of the Software, its documentation, or the Software's user interface. This includes social media links added for the author's profiles, which must remain in the footer as-is, unaltered. All copies, modifications, or substantial portions of the Software must include this copyright notice and attribution.
 
-3. **No Removal of Identifiers**: Alteration or removal of the author’s name, aliases, associated identifiers, or social media links is strictly prohibited in any copies, forks, redistributions, or modified versions of the Software.
+3. **No Removal of Identifiers**: Alteration or removal of the author's name, aliases, associated identifiers, or social media links is strictly prohibited in any copies, forks, redistributions, or modified versions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Author: Garrett Helms
 */
 
-    body { font-family: Arial, sans-serif; background-color: #f9f9f9; }
-    .container { 
-      max-width: 1200px; 
-      margin: 20px auto; 
-      padding: 20px; 
-      background-color: #fff; 
-      border: 1px solid #ccc; 
-      border-radius: 8px; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
-      animation: fadeIn 1s ease-out;
-    }
-    h1, h2 { text-align: center; }
-    .settings, .preview, .buttons {
-      margin-top: 25px; padding: 15px; border: 1px solid #ddd; border-radius: 6px; background-color: #fafafa;
-    }
-    .form-group { display: flex; align-items: center; margin: 8px 0; }
-    .form-group label { width: 120px; font-weight: bold; }
-    .form-group input, .form-group select { flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
-    .color-entries {
-      margin-top: 25px;
-      display: flex;
-      flex-wrap: wrap;
-    }
-    .entries-list {
-      flex: 1 1 60%;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background-color: #fafafa;
-      margin-right: 20px;
-      max-height: 500px;
-      overflow-y: auto;
-    }
-    .entry-form {
-      flex: 1 1 35%;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background-color: #fafafa;
-    }
-    .color-entry { 
-      display: flex; align-items: center; margin-top: 10px; padding: 10px; border: 1px solid #eee; border-radius: 6px; background-color: #fff; 
-      animation: slideIn 0.5s ease-out;
-      transition: background-color 0.5s;
-    }
-    .color-entry > div { margin-right: 10px; }
-    .color-entry input[type="color"] { width: 40px; height: 40px; padding: 0; border: none; }
-    .color-entry input[type="number"] { width: 80px; }
-    .color-entry select { width: 140px; }
-    .color-entry button { padding: 6px 12px; border: none; background-color: #e74c3c; color: #fff; border-radius: 4px; cursor: pointer; margin-left: 5px; }
-    .color-entry button:hover { background-color: #c0392b; }
-    .color-entry .edit-btn { background-color: #3498db; }
-    .color-entry .edit-btn:hover { background-color: #2980b9; }
-    .color-entry .duplicate-btn { background-color: #2ecc71; }
-    .color-entry .duplicate-btn:hover { background-color: #27ae60; }
-    .color-entry .handle { cursor: grab; padding: 0 10px; }
-    .preview-canvas { width: 100%; height: 100px; border: 1px solid #ccc; border-radius: 4px; position: relative; cursor: pointer; }
-    .preview-container { position: relative; }
-    .marker { position: absolute; top: 0; font-size: 12px; color: #000; text-align: center; transform: translateX(-50%); }
-    .buttons button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
-    .buttons button.save { background-color: #2c3e50; color: #fff; }
-    .buttons button.save:hover { background-color: #1a252f; }
-    .buttons button.load { background-color: #f39c12; color: #fff; }
-    .buttons button.load:hover { background-color: #d35400; }
-    .buttons button.undo { background-color: #e67e22; color: #fff; }
-    .buttons button.undo:hover { background-color: #d35400; }
-    .footer { text-align: center; margin-top: 40px; font-size: 0.9em; color: #666; }
-    .social-icons {
-      margin-top: 15px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    .social-icons a {
-      display: inline-block;
-      width: 32px;
-      height: 32px;
-      transition: transform 0.2s, opacity 0.2s;
-    }
-    .social-icons a svg {
-      width: 100%;
-      height: 100%;
-      fill: currentColor;
-    }
-    .social-icons a:hover {
-      transform: scale(1.1);
-      opacity: 0.8;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    @keyframes highlight {
-      from { background-color: #ffffcc; }
-      to { background-color: #fff; }
-    }
-    .fade-out {
-      animation: fadeOut 0.5s forwards;
-    }
-    .highlight {
-      animation: highlight 1s ease-out;
-    }
-    /* Highlight Class for Clicked Entries */
-    .highlight-scroll {
-      animation: highlight 1s ease-out;
-      border: 2px solid #3498db;
-    }
-    /* Dark Mode Styles */
-    body.dark-mode {
-      background-color: #121212;
-      color: #ffffff;
-    }
-    body.dark-mode .container {
-      background-color: #1e1e1e;
-      border-color: #333;
-      box-shadow: 0 2px 8px rgba(255,255,255,0.1);
-    }
-    body.dark-mode input, body.dark-mode select {
-      background-color: #2b2b2b;
-      color: #fff;
-      border-color: #444;
-    }
-    body.dark-mode .settings, 
-    body.dark-mode .color-entries, 
-    body.dark-mode .preview, 
-    body.dark-mode .buttons,
-    body.dark-mode .entries-list,
-    body.dark-mode .entry-form {
-      background-color: #1e1e1e;
-      border-color: #333;
-    }
-    body.dark-mode .preview-canvas {
-      border-color: #444;
-    }
-    body.dark-mode .form-group label {
-      color: #ccc;
-    }
-    body.dark-mode .color-entry {
-      background-color: #2b2b2b;
-      border-color: #444;
-    }
-    body.dark-mode .color-entry button {
-      background-color: #444;
-    }
-    body.dark-mode .color-entry button:hover {
-      background-color: #555;
-    }
-    body.dark-mode .footer {
-      color: #999;
-    }
-    body.dark-mode .social-icons a svg {
-      fill: #fff;
-    }
-    /* Responsive Design */
-    @media (max-width: 800px) {
-      .color-entries {
-        flex-direction: column;
-      }
-      .entries-list, .entry-form {
-        flex: 1 1 100%;
-        margin-right: 0;
-        margin-top: 20px;
-      }
-    }
+/* ── Theme Variables ── */
+:root {
+  --bg-page: #f0f2f5;
+  --bg-card: #ffffff;
+  --bg-input: #f8f9fb;
+  --bg-hover: #f3f4f8;
+  --text-primary: #1e1e2e;
+  --text-secondary: #555570;
+  --text-muted: #9090a8;
+  --border: #e2e4ea;
+  --border-focus: #6366f1;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-subtle: #eef2ff;
+  --success: #10b981;
+  --success-hover: #059669;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --warning: #f59e0b;
+  --warning-hover: #d97706;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 20px -4px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.06);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body.dark-mode {
+  --bg-page: #0d0d14;
+  --bg-card: #1a1a28;
+  --bg-input: #222234;
+  --bg-hover: #252540;
+  --text-primary: #e8e8f0;
+  --text-secondary: #a0a0b8;
+  --text-muted: #606078;
+  --border: #2a2a40;
+  --accent: #818cf8;
+  --accent-hover: #6366f1;
+  --accent-subtle: #1e1e3a;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 20px rgba(0,0,0,0.4);
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── App Header ── */
+.app-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+.app-header h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* ── Theme Toggle ── */
+.theme-toggle {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-family: var(--font);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Main Layout ── */
+.main-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.card-header:hover { background: var(--bg-hover); }
+.card-header h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toggle-icon {
+  transition: transform 0.25s;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+.toggle-icon.collapsed { transform: rotate(-90deg); }
+.card-body { padding: 20px; }
+.card-body.collapsed { display: none; }
+
+/* ── Settings Grid ── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.form-field { display: flex; flex-direction: column; gap: 5px; }
+.form-field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.form-field input,
+.form-field select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-family: var(--font);
+  transition: all 0.2s;
+  outline: none;
+}
+.form-field input:focus,
+.form-field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+.form-field input[type="color"] {
+  padding: 3px;
+  height: 38px;
+  cursor: pointer;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); box-shadow: var(--shadow-md); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: var(--success-hover); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: var(--danger-hover); }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover { background: var(--warning-hover); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: var(--bg-hover); border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: 5px 10px; font-size: 0.78rem; }
+.btn-icon {
+  padding: 5px;
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+/* ── Entries Toolbar ── */
+.entries-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-input);
+  flex-wrap: wrap;
+}
+.entries-count {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Color Entry Cards ── */
+.entries-container {
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+.entries-container::-webkit-scrollbar { width: 5px; }
+.entries-container::-webkit-scrollbar-track { background: transparent; }
+.entries-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.entries-container::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+.entries-empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+}
+.entries-empty .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.entries-empty p { font-size: 0.9rem; }
+
+.color-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 3px 0;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background: var(--bg-card);
+  transition: all 0.15s;
+  position: relative;
+  animation: entrySlideIn 0.3s ease-out;
+}
+.color-entry:hover {
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+.color-entry.dragging { opacity: 0.35; }
+.color-entry.drag-over-top { border-top-color: var(--accent); }
+.color-entry.drag-over-bottom { border-bottom-color: var(--accent); }
+
+.drag-handle {
+  cursor: grab;
+  color: var(--text-muted);
+  font-size: 1rem;
+  padding: 4px 2px;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.color-entry:hover .drag-handle { opacity: 1; }
+.drag-handle:active { cursor: grabbing; }
+
+.entry-color-bar {
+  width: 5px;
+  height: 36px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.entry-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.entry-type-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+.entry-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.entry-field label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.entry-field input[type="number"] {
+  width: 72px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: var(--font);
+  text-align: center;
+  outline: none;
+  transition: all 0.2s;
+}
+.entry-field input[type="number"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+.entry-field input[type="color"] {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.entry-field input[type="color"]:hover { border-color: var(--accent); }
+.entry-gradient-preview {
+  width: 60px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.color-entry:hover .entry-actions { opacity: 1; }
+
+/* ── Slide-In Entry Form Panel ── */
+.form-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.form-overlay.visible { opacity: 1; }
+
+.form-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 380px;
+  max-width: 92vw;
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.form-panel.open { transform: translateX(0); }
+
+.form-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.form-panel-header h2 { font-size: 1.05rem; font-weight: 600; }
+.form-panel-body {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+}
+.form-panel-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ── Preview ── */
+.preview-wrapper { padding: 16px 20px 20px; }
+.preview-canvas {
+  width: 100%;
+  height: 70px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.preview-canvas:hover { box-shadow: var(--shadow-md); }
+.preview-markers {
+  position: relative;
+  height: 22px;
+  margin-top: 4px;
+}
+.marker {
+  position: absolute;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ── Action Bar ── */
+.action-bar {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-input);
+  flex-wrap: wrap;
+}
+
+/* ── Toast Notifications ── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  padding: 12px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.85rem;
+  font-family: var(--font);
+  color: var(--text-primary);
+  animation: toastIn 0.3s ease-out;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.success { border-left: 4px solid var(--success); }
+.toast.error { border-left: 4px solid var(--danger); }
+.toast.info { border-left: 4px solid var(--accent); }
+.toast.fade-out { animation: toastOut 0.3s forwards; }
+
+/* ── Footer ── */
+.app-footer {
+  text-align: center;
+  padding: 32px 24px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.social-icons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+.social-icons a {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.social-icons a svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+.social-icons a:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+/* ── Animations ── */
+@keyframes entrySlideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(10px); }
+}
+@keyframes highlightPulse {
+  0% { background: var(--accent-subtle); border-color: var(--accent); }
+  100% { background: var(--bg-card); border-color: transparent; }
+}
+.highlight-entry { animation: highlightPulse 1.2s ease-out; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .main-container { padding: 12px; gap: 14px; }
+  .settings-grid { grid-template-columns: 1fr 1fr; }
+  .entry-info { gap: 8px; }
+  .form-panel { width: 100%; }
+  .app-header { padding: 12px 16px; }
+  .app-header h1 { font-size: 1.1rem; }
+  .entry-actions { opacity: 1; }
+}
+@media (max-width: 480px) {
+  .settings-grid { grid-template-columns: 1fr; }
+  .color-entry { flex-wrap: wrap; padding: 10px; }
+  .entries-toolbar { padding: 10px 14px; }
+}
   </style>
 </head>
 <body>
 
-<div class="container">
+<!-- App Header -->
+<header class="app-header">
   <h1>Color Table Creator</h1>
+  <div class="header-actions">
+    <button class="theme-toggle" id="darkModeToggle" onclick="toggleDarkMode()">
+      <span id="themeIcon">🌙</span> <span id="themeLabel">Dark</span>
+    </button>
+  </div>
+</header>
 
-  <!-- Settings Section -->
-  <div class="settings">
-    <h2>Settings</h2>
-    <div class="form-group">
-      <label for="product">Product:</label>
-      <input type="text" id="product" placeholder="Enter product name">
+<main class="main-container">
+
+  <!-- Settings Card -->
+  <div class="card" id="settingsCard">
+    <div class="card-header" onclick="toggleSection('settings')">
+      <h2>⚙️ Settings</h2>
+      <span class="toggle-icon" id="settingsToggle">▾</span>
     </div>
-    <div class="form-group">
-      <label for="units">Units:</label>
-      <input type="text" id="units" placeholder="Enter units">
-    </div>
-    <div class="form-group">
-      <label for="scale">Scale:</label>
-      <input type="number" id="scale" step="0.01" placeholder="Enter scale">
-    </div>
-    <div class="form-group">
-      <label for="offset">Offset:</label>
-      <input type="number" id="offset" step="0.01" placeholder="Enter offset">
-    </div>
-    <div class="form-group">
-      <label for="step">Step:</label>
-      <input type="number" id="step" step="0.01" placeholder="Enter step">
-    </div>
-    <div class="form-group">
-      <label for="rfColor">RF Color:</label>
-      <input type="color" id="rfColor" value="#404040">
-    </div>
-    <!-- Filename Input -->
-    <div class="form-group">
-      <label for="filename">Filename:</label>
-      <input type="text" id="filename" placeholder="Enter filename" value="color_table.pal">
-    </div>
-    <!-- Dark Mode Toggle -->
-    <div class="form-group">
-      <label for="darkMode">Dark Mode:</label>
-      <input type="checkbox" id="darkMode">
+    <div class="card-body" id="settingsBody">
+      <div class="settings-grid">
+        <div class="form-field">
+          <label for="product">Product</label>
+          <input type="text" id="product" placeholder="e.g. Reflectivity">
+        </div>
+        <div class="form-field">
+          <label for="units">Units</label>
+          <input type="text" id="units" placeholder="e.g. dBZ">
+        </div>
+        <div class="form-field">
+          <label for="scale">Scale</label>
+          <input type="number" id="scale" step="0.01" placeholder="e.g. 1.0">
+        </div>
+        <div class="form-field">
+          <label for="offset">Offset</label>
+          <input type="number" id="offset" step="0.01" placeholder="e.g. 0.0">
+        </div>
+        <div class="form-field">
+          <label for="step">Step</label>
+          <input type="number" id="step" step="0.01" placeholder="e.g. 5.0">
+        </div>
+        <div class="form-field">
+          <label for="rfColor">RF Color</label>
+          <input type="color" id="rfColor" value="#404040">
+        </div>
+        <div class="form-field">
+          <label for="filename">Filename</label>
+          <input type="text" id="filename" placeholder="color_table.pal" value="color_table.pal">
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Color Entries Section -->
-  <div class="color-entries">
-    <!-- Entries List -->
-    <div class="entries-list">
-      <h2>Color Entries</h2>
-      <button onclick="openAddForm()" style="padding: 8px 16px; background-color: #2980b9; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
-        Add Color
-      </button>
-      <div id="entriesContainer"></div>
-      <!-- NEW: Bottom Add Color Button -->
-      <button id="addColorBottom" onclick="openAddForm()" style="padding: 8px 16px; background-color: #2980b9; color: #fff; border: none; border-radius: 4px; cursor: pointer; display: none; margin-top: 10px;">
-        Add Color
-      </button>
+  <!-- Entries Card -->
+  <div class="card">
+    <div class="entries-toolbar">
+      <button class="btn btn-primary" onclick="openAddForm()">＋ Add Color</button>
+      <button class="btn btn-ghost btn-sm" onclick="sortEntries()">↕ Sort by Value</button>
+      <span class="entries-count" id="entriesCount">0 entries</span>
     </div>
-
-    <!-- Entry Form -->
-    <div class="entry-form" id="entryFormContainer" style="display: none;">
-      <h2 id="formTitle">Add Color Entry</h2>
-      <div class="form-group">
-        <label for="entryType">Type:</label>
-        <select id="entryType" onchange="toggleEntryFields()">
-          <option value="SolidColor">SolidColor</option>
-          <option value="SolidColor4">SolidColor4</option>
-          <option value="Color">Color</option>
-          <option value="Color4">Color4</option>
-        </select>
+    <div class="entries-container" id="entriesContainer">
+      <div class="entries-empty" id="emptyState">
+        <div class="empty-icon">🎨</div>
+        <p>No color entries yet.<br>Click <strong>Add Color</strong> to get started, or <strong>Load</strong> an existing file.</p>
       </div>
-      <div class="form-group">
-        <label for="entryValue">Value:</label>
-        <input type="number" id="entryValue" step="0.01" placeholder="Enter value">
-      </div>
-      <div class="form-group">
-        <label for="startColor">Start Color:</label>
-        <input type="color" id="startColor" value="#ffffff">
-      </div>
-      <div class="form-group" id="startAlphaGroup" style="display: none;">
-        <label for="startAlpha">Start Alpha:</label>
-        <input type="number" id="startAlpha" step="0.01" min="0" max="1" value="1">
-      </div>
-      <div class="form-group" id="endColorGroup" style="display: none;">
-        <label for="endColor">End Color:</label>
-        <input type="color" id="endColor" value="#ffffff">
-      </div>
-      <div class="form-group" id="endAlphaGroup" style="display: none;">
-        <label for="endAlpha">End Alpha:</label>
-        <input type="number" id="endAlpha" step="0.01" min="0" max="1" value="1">
-      </div>
-      <button onclick="saveEntry()" style="padding: 8px 16px; background-color: #27ae60; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
-        Save
-      </button>
-      <button onclick="cancelEdit()" style="padding: 8px 16px; background-color: #e74c3c; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
-        Cancel
-      </button>
+    </div>
+    <div class="action-bar">
+      <button class="btn btn-primary" onclick="saveColorTable()">💾 Save Table</button>
+      <button class="btn btn-warning" onclick="loadColorTable()">📂 Load File</button>
+      <button class="btn btn-ghost" onclick="undo()">↩ Undo</button>
     </div>
   </div>
 
-  <!-- Preview Section -->
-  <div class="preview">
-    <h2>Preview</h2>
-    <div class="preview-container">
+  <!-- Preview Card -->
+  <div class="card">
+    <div class="card-header" onclick="toggleSection('preview')">
+      <h2>🎨 Preview</h2>
+      <span class="toggle-icon" id="previewToggle">▾</span>
+    </div>
+    <div class="preview-wrapper" id="previewBody">
       <canvas id="previewCanvas" class="preview-canvas"></canvas>
-      <div id="markersContainer"></div>
+      <div class="preview-markers" id="markersContainer"></div>
     </div>
   </div>
 
-  <!-- Buttons for Save, Load, and Undo -->
-  <div class="buttons">
-    <button class="save" onclick="saveColorTable()">Save Color Table</button>
-    <button class="load" onclick="loadColorTable()">Load Color Table</button>
-    <button class="undo" onclick="undo()">Undo</button>
+</main>
+
+<!-- Slide-in Entry Form -->
+<div class="form-overlay" id="formOverlay" onclick="cancelEdit()"></div>
+<div class="form-panel" id="formPanel">
+  <div class="form-panel-header">
+    <h2 id="formTitle">Add Color Entry</h2>
+    <button class="btn btn-icon btn-ghost" onclick="cancelEdit()" title="Close">✕</button>
+  </div>
+  <div class="form-panel-body">
+    <div class="form-field">
+      <label for="entryType">Type</label>
+      <select id="entryType" onchange="toggleEntryFields()">
+        <option value="SolidColor">SolidColor</option>
+        <option value="SolidColor4">SolidColor4 (with alpha)</option>
+        <option value="Color">Color (gradient)</option>
+        <option value="Color4">Color4 (gradient + alpha)</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="entryValue">Value</label>
+      <input type="number" id="entryValue" step="1" placeholder="Enter value">
+    </div>
+    <div class="form-field">
+      <label for="startColor">Start Color</label>
+      <input type="color" id="startColor" value="#ffffff">
+    </div>
+    <div class="form-field" id="startAlphaGroup" style="display:none">
+      <label for="startAlpha">Start Alpha (0–1)</label>
+      <input type="number" id="startAlpha" step="0.01" min="0" max="1" value="1">
+    </div>
+    <div class="form-field" id="endColorGroup" style="display:none">
+      <label for="endColor">End Color</label>
+      <input type="color" id="endColor" value="#ffffff">
+    </div>
+    <div class="form-field" id="endAlphaGroup" style="display:none">
+      <label for="endAlpha">End Alpha (0–1)</label>
+      <input type="number" id="endAlpha" step="0.01" min="0" max="1" value="1">
+    </div>
+  </div>
+  <div class="form-panel-footer">
+    <button class="btn btn-ghost" onclick="cancelEdit()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveEntry()">Save Entry</button>
   </div>
 </div>
 
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
 <!-- Footer with Social Media Icons -->
-<div class="footer">
+<div class="app-footer">
   &copy; 2024-2025 Garrett Helms. All rights reserved.
   <div class="social-icons">
     <a href="https://x.com/WxGareBear" target="_blank" aria-label="Twitter/X">
@@ -422,84 +816,114 @@ Author: Garrett Helms
           zm6.406-11.845a1.44 1.44 0 11-2.88 0 
           1.44 1.44 0 012.88 0z"/>
       </svg>
+    </a>
   </div>
 </div>
 
 <script>
+  // ── State ──
   let colorEntries = [];
   let editingEntryId = null;
   let undoStack = [];
+  let draggedEntryId = null;
+  let isDarkMode = false;
 
-  // Entry Form Controls
-  const entryFormContainer = document.getElementById('entryFormContainer');
-  const formTitle = document.getElementById('formTitle');
-  const entryTypeSelect = document.getElementById('entryType');
-  const startAlphaGroup = document.getElementById('startAlphaGroup');
-  const endColorGroup = document.getElementById('endColorGroup');
-  const endAlphaGroup = document.getElementById('endAlphaGroup');
+  // ── Toast Notifications ──
+  function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('fade-out');
+      toast.addEventListener('animationend', () => toast.remove());
+    }, 2500);
+  }
+
+  // ── Section Toggle ──
+  function toggleSection(section) {
+    const body = document.getElementById(section + 'Body');
+    const icon = document.getElementById(section + 'Toggle');
+    if (body.classList.contains('collapsed')) {
+      body.classList.remove('collapsed');
+      icon.classList.remove('collapsed');
+    } else {
+      body.classList.add('collapsed');
+      icon.classList.add('collapsed');
+    }
+  }
+
+  // ── Dark Mode ──
+  function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    document.body.classList.toggle('dark-mode', isDarkMode);
+    document.getElementById('themeIcon').textContent = isDarkMode ? '☀️' : '🌙';
+    document.getElementById('themeLabel').textContent = isDarkMode ? 'Light' : 'Dark';
+  }
+
+  // ── Entry Form ──
+  function openFormPanel() {
+    const overlay = document.getElementById('formOverlay');
+    const panel = document.getElementById('formPanel');
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('visible');
+      panel.classList.add('open');
+    });
+  }
+
+  function closeFormPanel() {
+    const overlay = document.getElementById('formOverlay');
+    const panel = document.getElementById('formPanel');
+    panel.classList.remove('open');
+    overlay.classList.remove('visible');
+    setTimeout(() => { overlay.style.display = 'none'; }, 300);
+    editingEntryId = null;
+  }
 
   function openAddForm() {
     editingEntryId = null;
-    formTitle.textContent = 'Add Color Entry';
-    entryTypeSelect.value = 'SolidColor';
+    document.getElementById('formTitle').textContent = 'Add Color Entry';
+    document.getElementById('entryType').value = 'SolidColor';
     document.getElementById('entryValue').value = '';
     document.getElementById('startColor').value = '#ffffff';
     document.getElementById('startAlpha').value = '1';
     document.getElementById('endColor').value = '#ffffff';
     document.getElementById('endAlpha').value = '1';
     toggleEntryFields();
-    entryFormContainer.style.display = 'block';
+    openFormPanel();
   }
 
   function openEditForm(id) {
     const entry = colorEntries.find(e => e.id === id);
     if (!entry) return;
-
     editingEntryId = id;
-    formTitle.textContent = 'Edit Color Entry';
-    entryTypeSelect.value = entry.type;
+    document.getElementById('formTitle').textContent = 'Edit Color Entry';
+    document.getElementById('entryType').value = entry.type;
     document.getElementById('entryValue').value = entry.value;
     document.getElementById('startColor').value = entry.startColor;
     document.getElementById('startAlpha').value = entry.alpha;
     document.getElementById('endColor').value = entry.endColor || '#ffffff';
     document.getElementById('endAlpha').value = entry.endAlpha || '1';
     toggleEntryFields();
-    entryFormContainer.style.display = 'block';
-
-    // Scroll to the form
-    entryFormContainer.scrollIntoView({ behavior: 'smooth' });
+    openFormPanel();
   }
 
   function cancelEdit() {
-    entryFormContainer.style.display = 'none';
-    editingEntryId = null;
+    closeFormPanel();
   }
 
-  // Toggle visibility of alpha and end color fields based on type
   function toggleEntryFields() {
-    const type = entryTypeSelect.value;
-    if (type.endsWith('4')) {
-      startAlphaGroup.style.display = 'flex';
-      if (type.startsWith('Color')) {
-        endColorGroup.style.display = 'flex';
-        endAlphaGroup.style.display = 'flex';
-      } else {
-        endColorGroup.style.display = 'none';
-        endAlphaGroup.style.display = 'none';
-      }
-    } else {
-      startAlphaGroup.style.display = 'none';
-      if (type.startsWith('Color')) {
-        endColorGroup.style.display = 'flex';
-      } else {
-        endColorGroup.style.display = 'none';
-      }
-      endAlphaGroup.style.display = 'none';
-    }
+    const type = document.getElementById('entryType').value;
+    document.getElementById('startAlphaGroup').style.display = type.endsWith('4') ? '' : 'none';
+    document.getElementById('endColorGroup').style.display = type.startsWith('Color') ? '' : 'none';
+    document.getElementById('endAlphaGroup').style.display = (type === 'Color4') ? '' : 'none';
   }
 
+  // ── State Management ──
   function saveState() {
-    const state = {
+    undoStack.push({
       colorEntries: JSON.parse(JSON.stringify(colorEntries)),
       settings: {
         product: document.getElementById('product').value,
@@ -509,387 +933,420 @@ Author: Garrett Helms
         step: document.getElementById('step').value,
         rfColor: document.getElementById('rfColor').value,
         filename: document.getElementById('filename').value,
-        darkMode: document.getElementById('darkMode').checked
+        darkMode: isDarkMode
       }
-    };
-    undoStack.push(state);
+    });
   }
 
+  function undo() {
+    if (undoStack.length > 0) {
+      const prev = undoStack.pop();
+      colorEntries = prev.colorEntries;
+      document.getElementById('product').value = prev.settings.product;
+      document.getElementById('units').value = prev.settings.units;
+      document.getElementById('scale').value = prev.settings.scale;
+      document.getElementById('offset').value = prev.settings.offset;
+      document.getElementById('step').value = prev.settings.step;
+      document.getElementById('rfColor').value = prev.settings.rfColor;
+      document.getElementById('filename').value = prev.settings.filename;
+      if (prev.settings.darkMode !== isDarkMode) toggleDarkMode();
+      renderEntries();
+      updatePreview();
+      showToast('Undone', 'info');
+    } else {
+      showToast('Nothing to undo', 'info');
+    }
+  }
+
+  // Ctrl+Z undo
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      // Don't intercept if user is typing in an input/select
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+      e.preventDefault();
+      undo();
+    }
+  });
+
+  // ── Save / Edit Entry ──
   function saveEntry() {
-    saveState(); // Save state before making changes
-    const type = entryTypeSelect.value;
+    const type = document.getElementById('entryType').value;
     const value = parseFloat(document.getElementById('entryValue').value);
     const startColor = document.getElementById('startColor').value;
     const alpha = type.endsWith('4') ? parseFloat(document.getElementById('startAlpha').value) : 1;
-    const endColor = (type.startsWith('Color') && document.getElementById('endColor').value !== '#ffffff') ? document.getElementById('endColor').value : null;
-    const endAlpha = (type === 'Color4' || type === 'Color') ? parseFloat(document.getElementById('endAlpha').value) : 1;
+    const endColor = type.startsWith('Color') ? document.getElementById('endColor').value : null;
+    const endAlpha = (type === 'Color4') ? parseFloat(document.getElementById('endAlpha').value) : 1;
 
-    // Basic validation
-    if (isNaN(value)) {
-      alert('Please enter a valid value.');
-      return;
+    if (isNaN(value)) { showToast('Please enter a valid value.', 'error'); return; }
+    if (type.endsWith('4') && (isNaN(alpha) || alpha < 0 || alpha > 1)) {
+      showToast('Start Alpha must be between 0 and 1.', 'error'); return;
     }
-    if (type.endsWith('4')) {
-      if (isNaN(alpha) || alpha < 0 || alpha > 1) {
-        alert('Start Alpha must be between 0 and 1.');
-        return;
-      }
-      if (type === 'Color4' && (isNaN(endAlpha) || endAlpha < 0 || endAlpha > 1)) {
-        alert('End Alpha must be between 0 and 1.');
-        return;
-      }
+    if (type === 'Color4' && (isNaN(endAlpha) || endAlpha < 0 || endAlpha > 1)) {
+      showToast('End Alpha must be between 0 and 1.', 'error'); return;
     }
+
+    saveState();
 
     if (editingEntryId !== null) {
-      // Update existing entry
-      const entryIndex = colorEntries.findIndex(e => e.id === editingEntryId);
-      if (entryIndex !== -1) {
-        colorEntries[entryIndex] = {
-          id: editingEntryId,
-          type,
-          value,
-          startColor,
-          alpha,
-          endColor,
-          endAlpha
-        };
+      const idx = colorEntries.findIndex(e => e.id === editingEntryId);
+      if (idx !== -1) {
+        colorEntries[idx] = { id: editingEntryId, type, value, startColor, alpha, endColor, endAlpha };
       }
+      showToast('Entry updated', 'success');
     } else {
-      // Add new entry
       const newId = colorEntries.length > 0 ? Math.max(...colorEntries.map(e => e.id)) + 1 : 0;
-      colorEntries.push({
-        id: newId,
-        type,
-        value,
-        startColor,
-        alpha,
-        endColor,
-        endAlpha
-      });
+      colorEntries.push({ id: newId, type, value, startColor, alpha, endColor, endAlpha });
+      showToast('Entry added', 'success');
     }
 
     renderEntries();
     updatePreview();
-    cancelEdit();
-
-    // Highlight the edited entry if applicable
-    if (editingEntryId !== null) {
-      const editedEntryDiv = document.querySelector(`.color-entry[data-id='${editingEntryId}']`);
-      if (editedEntryDiv) {
-        editedEntryDiv.classList.add('highlight');
-        setTimeout(() => {
-          editedEntryDiv.classList.remove('highlight');
-        }, 1000);
-      }
-    }
+    closeFormPanel();
   }
 
+  // ── Entry Operations ──
   function duplicateEntry(id) {
-    saveState(); // Save state before making changes
+    saveState();
     const entry = colorEntries.find(e => e.id === id);
     if (!entry) return;
     const newId = colorEntries.length > 0 ? Math.max(...colorEntries.map(e => e.id)) + 1 : 0;
-    const duplicatedEntry = { ...entry, id: newId };
-    colorEntries.push(duplicatedEntry);
+    colorEntries.push({ ...entry, id: newId });
     renderEntries();
     updatePreview();
+    showToast('Entry duplicated', 'success');
   }
 
   function removeEntry(id) {
-    saveState(); // Save state before making changes
-    // Find the entry DOM element
+    saveState();
     const entryDiv = document.querySelector(`.color-entry[data-id='${id}']`);
     if (entryDiv) {
-      // Add fade-out animation
-      entryDiv.classList.add('fade-out');
-      // Wait for the animation to finish before removing
-      entryDiv.addEventListener('animationend', () => {
+      entryDiv.style.transition = 'opacity 0.3s, transform 0.3s';
+      entryDiv.style.opacity = '0';
+      entryDiv.style.transform = 'translateX(-20px)';
+      setTimeout(() => {
         colorEntries = colorEntries.filter(e => e.id !== id);
         renderEntries();
         updatePreview();
-      }, { once: true });
+        showToast('Entry removed', 'info');
+      }, 300);
     } else {
-      // If not found, remove immediately
       colorEntries = colorEntries.filter(e => e.id !== id);
       renderEntries();
       updatePreview();
     }
   }
 
-  // Undo Functionality
-  function undo() {
-    if (undoStack.length > 0) {
-      const prevState = undoStack.pop();
-      colorEntries = prevState.colorEntries;
-      document.getElementById('product').value = prevState.settings.product;
-      document.getElementById('units').value = prevState.settings.units;
-      document.getElementById('scale').value = prevState.settings.scale;
-      document.getElementById('offset').value = prevState.settings.offset;
-      document.getElementById('step').value = prevState.settings.step;
-      document.getElementById('rfColor').value = prevState.settings.rfColor;
-      document.getElementById('filename').value = prevState.settings.filename;
-      document.getElementById('darkMode').checked = prevState.settings.darkMode;
-      if (prevState.settings.darkMode) {
-        document.body.classList.add('dark-mode');
+  function sortEntries() {
+    saveState();
+    colorEntries.sort((a, b) => a.value - b.value);
+    renderEntries();
+    updatePreview();
+    showToast('Sorted by value', 'info');
+  }
+
+  // ── Drag and Drop ──
+  function setupDragAndDrop(entryDiv, entry) {
+    const handle = entryDiv.querySelector('.drag-handle');
+
+    handle.addEventListener('mousedown', () => {
+      entryDiv.setAttribute('draggable', 'true');
+    });
+
+    handle.addEventListener('mouseup', () => {
+      entryDiv.setAttribute('draggable', 'false');
+    });
+
+    entryDiv.addEventListener('dragstart', (e) => {
+      draggedEntryId = entry.id;
+      entryDiv.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', entry.id.toString());
+    });
+
+    entryDiv.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (entry.id === draggedEntryId) return;
+
+      // Clear all other indicators
+      document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => {
+        el.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+
+      const rect = entryDiv.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (e.clientY < midY) {
+        entryDiv.classList.add('drag-over-top');
       } else {
-        document.body.classList.remove('dark-mode');
+        entryDiv.classList.add('drag-over-bottom');
       }
+    });
+
+    entryDiv.addEventListener('dragleave', () => {
+      entryDiv.classList.remove('drag-over-top', 'drag-over-bottom');
+    });
+
+    entryDiv.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (entry.id === draggedEntryId) return;
+
+      saveState();
+
+      const isAbove = entryDiv.classList.contains('drag-over-top');
+      const srcIdx = colorEntries.findIndex(x => x.id === draggedEntryId);
+      const [moved] = colorEntries.splice(srcIdx, 1);
+      let tgtIdx = colorEntries.findIndex(x => x.id === entry.id);
+      if (!isAbove) tgtIdx++;
+      colorEntries.splice(tgtIdx, 0, moved);
 
       renderEntries();
       updatePreview();
-    } else {
-      alert('Nothing to undo.');
-    }
+      showToast('Entry moved', 'info');
+    });
+
+    entryDiv.addEventListener('dragend', () => {
+      entryDiv.classList.remove('dragging');
+      entryDiv.setAttribute('draggable', 'false');
+      document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => {
+        el.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+      draggedEntryId = null;
+    });
   }
 
-  // Keyboard Shortcut for Undo (Ctrl + Z)
-  document.addEventListener('keydown', function(event) {
-    if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
-      event.preventDefault();
-      undo();
-    }
-  });
-
-  // Drag and Drop Reordering
-  let dragSrcEl = null;
-
-  function handleDragStart(e) {
-    dragSrcEl = this;
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', this.innerHTML);
-    this.style.opacity = '0.4';
-  }
-
-  function handleDragOver(e) {
-    if (e.preventDefault) e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    return false;
-  }
-
-  function handleDrop(e) {
-    if (e.stopPropagation) e.stopPropagation();
-
-    if (dragSrcEl !== this) {
-      saveState(); // Save state before making changes
-      const srcId = parseInt(dragSrcEl.getAttribute('data-id'));
-      const tgtId = parseInt(this.getAttribute('data-id'));
-
-      const srcIndex = colorEntries.findIndex(e => e.id === srcId);
-      const tgtIndex = colorEntries.findIndex(e => e.id === tgtId);
-
-      // Swap the entries
-      [colorEntries[srcIndex], colorEntries[tgtIndex]] = [colorEntries[tgtIndex], colorEntries[srcIndex]];
-      renderEntries();
-      updatePreview();
-    }
-    return false;
-  }
-
-  function handleDragEnd() {
-    this.style.opacity = '1';
-  }
-
-  function addDragAndDropHandlers(entryDiv) {
-    entryDiv.setAttribute('draggable', 'true');
-    entryDiv.addEventListener('dragstart', handleDragStart, false);
-    entryDiv.addEventListener('dragover', handleDragOver, false);
-    entryDiv.addEventListener('drop', handleDrop, false);
-    entryDiv.addEventListener('dragend', handleDragEnd, false);
-  }
-
-  // Dark Mode Toggle
-  document.getElementById('darkMode').addEventListener('change', function() {
-    saveState(); // Save state before making changes
-    if (this.checked) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
-  });
-
-  // Render Color Entries with Inline Editing and Hover Effects
+  // ── Render Entries ──
   function renderEntries() {
     const container = document.getElementById('entriesContainer');
     container.innerHTML = '';
 
-    colorEntries.sort((a, b) => a.value - b.value); // Sort by value
+    // NOTE: No auto-sort here — entries stay in user-defined order.
+    // Use "Sort by Value" button for explicit sorting.
+
+    document.getElementById('entriesCount').textContent = `${colorEntries.length} entr${colorEntries.length === 1 ? 'y' : 'ies'}`;
+
+    if (colorEntries.length === 0) {
+      container.innerHTML = `
+        <div class="entries-empty">
+          <div class="empty-icon">🎨</div>
+          <p>No color entries yet.<br>Click <strong>Add Color</strong> to get started, or <strong>Load</strong> an existing file.</p>
+        </div>`;
+      return;
+    }
 
     colorEntries.forEach(entry => {
-      const entryDiv = document.createElement('div');
-      entryDiv.classList.add('color-entry');
-      entryDiv.setAttribute('data-id', entry.id);
+      const el = document.createElement('div');
+      el.className = 'color-entry';
+      el.setAttribute('data-id', entry.id);
 
-      // Drag Handle
-      const handleDiv = document.createElement('div');
-      handleDiv.classList.add('handle');
-      handleDiv.innerHTML = '☰';
-      entryDiv.appendChild(handleDiv);
+      // Color bar on left
+      const bar = document.createElement('div');
+      bar.className = 'entry-color-bar';
+      bar.style.background = entry.endColor
+        ? `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`
+        : entry.startColor;
+      el.appendChild(bar);
 
-      // Value Display with Inline Editing
-      const valueDiv = document.createElement('div');
-      const valueLabel = document.createElement('span');
-      valueLabel.textContent = 'Value: ';
-      const valueInput = document.createElement('input');
-      valueInput.type = 'number';
-      valueInput.step = '0.01';
-      valueInput.value = entry.value;
-      valueInput.style.width = '80px';
-      valueInput.onchange = function() {
-        saveState(); // Save state before making changes
-        entry.value = parseFloat(valueInput.value);
-        renderEntries();
+      // Drag handle
+      const handle = document.createElement('div');
+      handle.className = 'drag-handle';
+      handle.innerHTML = '⠿';
+      handle.title = 'Drag to reorder';
+      el.appendChild(handle);
+
+      // Info section
+      const info = document.createElement('div');
+      info.className = 'entry-info';
+
+      // Type badge
+      const badge = document.createElement('span');
+      badge.className = 'entry-type-badge';
+      badge.textContent = entry.type;
+      info.appendChild(badge);
+
+      // Value input
+      const valField = document.createElement('div');
+      valField.className = 'entry-field';
+      const valLabel = document.createElement('label');
+      valLabel.textContent = 'Val';
+      const valInput = document.createElement('input');
+      valInput.type = 'number';
+      valInput.step = '1';
+      valInput.value = entry.value;
+      valInput.onchange = function() {
+        saveState();
+        entry.value = parseFloat(this.value);
         updatePreview();
       };
-      valueDiv.appendChild(valueLabel);
-      valueDiv.appendChild(valueInput);
-      entryDiv.appendChild(valueDiv);
+      valField.appendChild(valLabel);
+      valField.appendChild(valInput);
+      info.appendChild(valField);
 
-      // Start Color Display with Inline Editing
-      const startColorDiv = document.createElement('div');
-      const startColorLabel = document.createElement('span');
-      startColorLabel.textContent = 'Start: ';
-      const startColorSwatch = document.createElement('input');
-      startColorSwatch.type = 'color';
-      startColorSwatch.value = entry.startColor;
-      startColorSwatch.title = `RGB: ${hexToRgb(entry.startColor).r}, ${hexToRgb(entry.startColor).g}, ${hexToRgb(entry.startColor).b}`;
-      startColorSwatch.oninput = function() {
-        saveState(); // Save state before making changes
-        entry.startColor = startColorSwatch.value;
+      // Start color swatch
+      const startField = document.createElement('div');
+      startField.className = 'entry-field';
+      const startLabel = document.createElement('label');
+      startLabel.textContent = 'Start';
+      const startInput = document.createElement('input');
+      startInput.type = 'color';
+      startInput.value = entry.startColor;
+      startInput.title = `RGB: ${hexToRgb(entry.startColor).r}, ${hexToRgb(entry.startColor).g}, ${hexToRgb(entry.startColor).b}`;
+      startInput.oninput = function() {
+        entry.startColor = this.value;
+        bar.style.background = entry.endColor
+          ? `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`
+          : entry.startColor;
         updatePreview();
       };
-      startColorDiv.appendChild(startColorLabel);
-      startColorDiv.appendChild(startColorSwatch);
-      entryDiv.appendChild(startColorDiv);
+      startInput.onchange = function() { saveState(); };
+      startField.appendChild(startLabel);
+      startField.appendChild(startInput);
+      info.appendChild(startField);
 
-      // Start Alpha Display with Inline Editing
-      const startAlphaDiv = document.createElement('div');
+      // Start alpha
       if (entry.type.endsWith('4')) {
-        const startAlphaLabel = document.createElement('span');
-        startAlphaLabel.textContent = 'Start Alpha: ';
-        const startAlphaInput = document.createElement('input');
-        startAlphaInput.type = 'number';
-        startAlphaInput.step = '0.01';
-        startAlphaInput.min = '0';
-        startAlphaInput.max = '1';
-        startAlphaInput.value = entry.alpha;
-        startAlphaInput.style.width = '50px';
-        startAlphaInput.onchange = function() {
-          saveState(); // Save state before making changes
-          entry.alpha = parseFloat(startAlphaInput.value);
+        const alphaField = document.createElement('div');
+        alphaField.className = 'entry-field';
+        const aLabel = document.createElement('label');
+        aLabel.textContent = 'α';
+        const aInput = document.createElement('input');
+        aInput.type = 'number';
+        aInput.step = '0.01';
+        aInput.min = '0';
+        aInput.max = '1';
+        aInput.value = entry.alpha;
+        aInput.style.width = '52px';
+        aInput.onchange = function() {
+          saveState();
+          entry.alpha = parseFloat(this.value);
           updatePreview();
         };
-        startAlphaDiv.appendChild(startAlphaLabel);
-        startAlphaDiv.appendChild(startAlphaInput);
+        alphaField.appendChild(aLabel);
+        alphaField.appendChild(aInput);
+        info.appendChild(alphaField);
       }
-      entryDiv.appendChild(startAlphaDiv);
 
-      // End Color Display with Inline Editing (if applicable)
+      // End color
       if (entry.endColor) {
-        const endColorDiv = document.createElement('div');
-        const endColorLabel = document.createElement('span');
-        endColorLabel.textContent = 'End: ';
-        const endColorSwatch = document.createElement('input');
-        endColorSwatch.type = 'color';
-        endColorSwatch.value = entry.endColor;
-        endColorSwatch.title = `RGB: ${hexToRgb(entry.endColor).r}, ${hexToRgb(entry.endColor).g}, ${hexToRgb(entry.endColor).b}`;
-        endColorSwatch.oninput = function() {
-          saveState(); // Save state before making changes
-          entry.endColor = endColorSwatch.value;
+        const endField = document.createElement('div');
+        endField.className = 'entry-field';
+        const endLabel = document.createElement('label');
+        endLabel.textContent = 'End';
+        const endInput = document.createElement('input');
+        endInput.type = 'color';
+        endInput.value = entry.endColor;
+        endInput.title = `RGB: ${hexToRgb(entry.endColor).r}, ${hexToRgb(entry.endColor).g}, ${hexToRgb(entry.endColor).b}`;
+        endInput.oninput = function() {
+          entry.endColor = this.value;
+          bar.style.background = `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`;
           updatePreview();
         };
-        endColorDiv.appendChild(endColorLabel);
-        endColorDiv.appendChild(endColorSwatch);
-        entryDiv.appendChild(endColorDiv);
+        endInput.onchange = function() { saveState(); };
+        endField.appendChild(endLabel);
+        endField.appendChild(endInput);
+        info.appendChild(endField);
 
-        // End Alpha Display with Inline Editing
-        const endAlphaDiv = document.createElement('div');
+        // Gradient preview chip
+        const gradPreview = document.createElement('div');
+        gradPreview.className = 'entry-gradient-preview';
+        gradPreview.style.background = `linear-gradient(to right, ${entry.startColor}, ${entry.endColor})`;
+        info.appendChild(gradPreview);
+
+        // End alpha
         if (entry.type.endsWith('4')) {
-          const endAlphaLabel = document.createElement('span');
-          endAlphaLabel.textContent = 'End Alpha: ';
-          const endAlphaInput = document.createElement('input');
-          endAlphaInput.type = 'number';
-          endAlphaInput.step = '0.01';
-          endAlphaInput.min = '0';
-          endAlphaInput.max = '1';
-          endAlphaInput.value = entry.endAlpha;
-          endAlphaInput.style.width = '50px';
-          endAlphaInput.onchange = function() {
-            saveState(); // Save state before making changes
-            entry.endAlpha = parseFloat(endAlphaInput.value);
+          const eaField = document.createElement('div');
+          eaField.className = 'entry-field';
+          const eaLabel = document.createElement('label');
+          eaLabel.textContent = 'α₂';
+          const eaInput = document.createElement('input');
+          eaInput.type = 'number';
+          eaInput.step = '0.01';
+          eaInput.min = '0';
+          eaInput.max = '1';
+          eaInput.value = entry.endAlpha;
+          eaInput.style.width = '52px';
+          eaInput.onchange = function() {
+            saveState();
+            entry.endAlpha = parseFloat(this.value);
             updatePreview();
           };
-          endAlphaDiv.appendChild(endAlphaLabel);
-          endAlphaDiv.appendChild(endAlphaInput);
+          eaField.appendChild(eaLabel);
+          eaField.appendChild(eaInput);
+          info.appendChild(eaField);
         }
-        entryDiv.appendChild(endAlphaDiv);
       }
 
-      // Action Buttons
-      const actionsDiv = document.createElement('div');
-      // Edit Button
+      el.appendChild(info);
+
+      // Action buttons
+      const actions = document.createElement('div');
+      actions.className = 'entry-actions';
+
       const editBtn = document.createElement('button');
-      editBtn.textContent = 'Edit';
-      editBtn.classList.add('edit-btn');
-      editBtn.onclick = () => openEditForm(entry.id);
-      actionsDiv.appendChild(editBtn);
-      // Duplicate Button
-      const duplicateBtn = document.createElement('button');
-      duplicateBtn.textContent = 'Duplicate';
-      duplicateBtn.classList.add('duplicate-btn');
-      duplicateBtn.onclick = () => duplicateEntry(entry.id);
-      actionsDiv.appendChild(duplicateBtn);
-      // Remove Button
-      const removeBtn = document.createElement('button');
-      removeBtn.textContent = 'Remove';
-      removeBtn.onclick = () => removeEntry(entry.id);
-      actionsDiv.appendChild(removeBtn);
-      entryDiv.appendChild(actionsDiv);
+      editBtn.className = 'btn btn-icon btn-ghost';
+      editBtn.innerHTML = '✏️';
+      editBtn.title = 'Edit';
+      editBtn.onclick = (e) => { e.stopPropagation(); openEditForm(entry.id); };
+      actions.appendChild(editBtn);
 
-      // Hover Effect to Highlight Preview Segment
-      entryDiv.addEventListener('mouseover', function() {
-        highlightPreviewSegment(entry);
-      });
-      entryDiv.addEventListener('mouseout', function() {
-        updatePreview();
-      });
+      const dupBtn = document.createElement('button');
+      dupBtn.className = 'btn btn-icon btn-ghost';
+      dupBtn.innerHTML = '📋';
+      dupBtn.title = 'Duplicate';
+      dupBtn.onclick = (e) => { e.stopPropagation(); duplicateEntry(entry.id); };
+      actions.appendChild(dupBtn);
 
-      // Append drag and drop handlers
-      addDragAndDropHandlers(entryDiv);
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn btn-icon btn-ghost';
+      delBtn.innerHTML = '🗑️';
+      delBtn.title = 'Remove';
+      delBtn.style.color = 'var(--danger)';
+      delBtn.onclick = (e) => { e.stopPropagation(); removeEntry(entry.id); };
+      actions.appendChild(delBtn);
 
-      container.appendChild(entryDiv);
+      el.appendChild(actions);
+
+      // Hover → highlight preview segment
+      el.addEventListener('mouseover', () => highlightPreviewSegment(entry));
+      el.addEventListener('mouseout', () => updatePreview());
+
+      // Setup drag and drop
+      setupDragAndDrop(el, entry);
+
+      container.appendChild(el);
     });
-
-    // Conditionally display the bottom Add Color button if entries exist
-    document.getElementById('addColorBottom').style.display = colorEntries.length > 0 ? 'block' : 'none';
   }
 
-  // Function to Highlight Preview Segment
+  // ── Preview ──
   function highlightPreviewSegment(entry) {
     const canvas = document.getElementById('previewCanvas');
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
 
-    // Redraw the preview
     updatePreview();
 
-    // Calculate positions
-    const sortedEntries = [...colorEntries].sort((a, b) => a.value - b.value);
-    const minVal = sortedEntries[0].value;
-    const maxVal = sortedEntries[sortedEntries.length - 1].value;
-    const range = maxVal - minVal || 1; // Prevent division by zero
+    const sorted = [...colorEntries].sort((a, b) => a.value - b.value);
+    if (sorted.length < 1) return;
+    const minVal = sorted[0].value;
+    const maxVal = sorted[sorted.length - 1].value;
+    const range = maxVal - minVal || 1;
 
-    const xPos = ((entry.value - minVal) / range) * width;
-    const index = sortedEntries.indexOf(entry);
-    const nextEntry = sortedEntries[index + 1];
-    const nextXPos = nextEntry ? ((nextEntry.value - minVal) / range) * width : width;
+    const idx = sorted.findIndex(e => e.id === entry.id);
+    if (idx === -1) return;
+    const xPos = ((sorted[idx].value - minVal) / range) * width;
+    const nextXPos = idx < sorted.length - 1
+      ? ((sorted[idx + 1].value - minVal) / range) * width
+      : width;
 
-    // Overlay highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
     ctx.fillRect(xPos, 0, nextXPos - xPos, height);
+
+    // Draw highlight border
+    ctx.strokeStyle = 'rgba(99, 102, 241, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(xPos + 1, 1, (nextXPos - xPos) - 2, height - 2);
   }
 
-  // Update Preview Canvas and Markers
   function updatePreview() {
     const canvas = document.getElementById('previewCanvas');
     const ctx = canvas.getContext('2d');
@@ -898,189 +1355,192 @@ Author: Garrett Helms
     ctx.clearRect(0, 0, width, height);
 
     const markersContainer = document.getElementById('markersContainer');
-    markersContainer.innerHTML = ''; // Clear previous markers
+    markersContainer.innerHTML = '';
 
-    if (colorEntries.length === 0) return;
+    if (colorEntries.length === 0) {
+      // Draw empty state
+      ctx.fillStyle = 'var(--bg-input)';
+      ctx.fillRect(0, 0, width, height);
+      return;
+    }
 
-    // Sort entries by value
-    const sortedEntries = [...colorEntries].sort((a, b) => a.value - b.value);
-    const minVal = sortedEntries[0].value;
-    const maxVal = sortedEntries[sortedEntries.length - 1].value;
-    const range = maxVal - minVal || 1; // Prevent division by zero
+    // Always sort a copy for preview rendering
+    const sorted = [...colorEntries].sort((a, b) => a.value - b.value);
+    const minVal = sorted[0].value;
+    const maxVal = sorted[sorted.length - 1].value;
+    const range = maxVal - minVal || 1;
 
-    sortedEntries.forEach((entry, index) => {
+    sorted.forEach((entry, index) => {
       let xPos = ((entry.value - minVal) / range) * width;
-      let nextXPos = index < sortedEntries.length - 1
-        ? ((sortedEntries[index + 1].value - minVal) / range) * width
+      let nextXPos = index < sorted.length - 1
+        ? ((sorted[index + 1].value - minVal) / range) * width
         : width;
 
-      // Ensure xPos and nextXPos are within canvas boundaries
       xPos = Math.max(0, Math.min(width, xPos));
       nextXPos = Math.max(0, Math.min(width, nextXPos));
 
-      // Handle zero-width segments
-      let segmentWidth = nextXPos - xPos;
-      if (segmentWidth < 1) {
-        segmentWidth = 1;
-        if (nextXPos < width) {
-          nextXPos = xPos + segmentWidth;
-        } else {
-          xPos = nextXPos - segmentWidth;
-        }
+      let segWidth = nextXPos - xPos;
+      if (segWidth < 1) {
+        segWidth = 1;
+        if (nextXPos < width) nextXPos = xPos + segWidth;
+        else xPos = nextXPos - segWidth;
       }
 
-      // Improved Gradient Transition
-      let gradient;
+      let fill;
       if (entry.endColor) {
-        gradient = ctx.createLinearGradient(xPos, 0, nextXPos, 0);
-        gradient.addColorStop(0, rgbaColor(entry.startColor, entry.alpha));
-        gradient.addColorStop(1, rgbaColor(entry.endColor, entry.endAlpha));
-      } else if (index < sortedEntries.length - 1 && sortedEntries[index + 1].startColor) {
-        // If the next entry is a gradient, blend current endColor with next startColor
-        const nextEntry = sortedEntries[index + 1];
-        gradient = ctx.createLinearGradient(xPos, 0, nextXPos, 0);
-        gradient.addColorStop(0, rgbaColor(entry.startColor, entry.alpha));
-        gradient.addColorStop(1, rgbaColor(nextEntry.startColor, nextEntry.alpha));
+        fill = ctx.createLinearGradient(xPos, 0, nextXPos, 0);
+        fill.addColorStop(0, rgbaColor(entry.startColor, entry.alpha));
+        fill.addColorStop(1, rgbaColor(entry.endColor, entry.endAlpha));
+      } else if (index < sorted.length - 1) {
+        const next = sorted[index + 1];
+        fill = ctx.createLinearGradient(xPos, 0, nextXPos, 0);
+        fill.addColorStop(0, rgbaColor(entry.startColor, entry.alpha));
+        fill.addColorStop(1, rgbaColor(next.startColor, next.alpha));
       } else {
-        // Fill with solid color
-        gradient = rgbaColor(entry.startColor, entry.alpha);
+        fill = rgbaColor(entry.startColor, entry.alpha);
       }
-      ctx.fillStyle = gradient;
-      ctx.fillRect(xPos, 0, segmentWidth, height);
+      ctx.fillStyle = fill;
+      ctx.fillRect(xPos, 0, segWidth, height);
 
-      // Add value markers
+      // Markers
       addValueMarker(entry.value, xPos, width);
     });
 
-    // Add RF Color overlay
+    // RF color overlay
     const rfColor = document.getElementById('rfColor').value;
-    ctx.fillStyle = rgbaColor(rfColor, 0.3); // Semi-transparent overlay
+    ctx.fillStyle = rgbaColor(rfColor, 0.3);
     ctx.fillRect(0, 0, width, height);
   }
 
-  // Function to add value markers on the preview canvas
   function addValueMarker(value, xPos, canvasWidth) {
     const markersContainer = document.getElementById('markersContainer');
+    const minDist = 50;
+    const last = markersContainer.lastElementChild;
+    if (last && Math.abs(xPos - parseFloat(last.style.left)) < minDist) return;
 
-    // Prevent overlapping markers by setting a minimum distance
-    const minDistance = 50; // Minimum distance in pixels between markers
-    const lastMarker = markersContainer.lastElementChild;
-    if (lastMarker) {
-      const lastX = parseFloat(lastMarker.style.left);
-      if (Math.abs(xPos - lastX) < minDistance) {
-        return;
-      }
-    }
-
-    const markerDiv = document.createElement('div');
-    markerDiv.classList.add('marker');
-    markerDiv.style.left = `${xPos}px`;
-    markerDiv.textContent = value;
-    markersContainer.appendChild(markerDiv);
+    const div = document.createElement('div');
+    div.className = 'marker';
+    div.style.left = `${xPos}px`;
+    div.textContent = value;
+    markersContainer.appendChild(div);
   }
 
-  // Convert Hex to RGBA
+  // ── Preview Click → scroll to entry ──
+  document.getElementById('previewCanvas').addEventListener('click', function(event) {
+    const canvas = this;
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+
+    const sorted = [...colorEntries].sort((a, b) => a.value - b.value);
+    if (sorted.length === 0) return;
+    const minVal = sorted[0].value;
+    const maxVal = sorted[sorted.length - 1].value;
+    const width = canvas.width;
+    const range = maxVal - minVal || 1;
+
+    let clicked = null;
+    sorted.some((entry, index) => {
+      const ex = ((entry.value - minVal) / range) * width;
+      const nx = index < sorted.length - 1
+        ? ((sorted[index + 1].value - minVal) / range) * width
+        : width;
+      if (x >= ex && x <= nx) { clicked = entry; return true; }
+      return false;
+    });
+
+    if (clicked) {
+      const el = document.querySelector(`.color-entry[data-id="${clicked.id}"]`);
+      if (el) {
+        document.querySelectorAll('.highlight-entry').forEach(e => e.classList.remove('highlight-entry'));
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('highlight-entry');
+        setTimeout(() => el.classList.remove('highlight-entry'), 1500);
+      }
+    }
+  });
+
+  // ── Utility ──
   function rgbaColor(hex, alpha) {
     const bigint = parseInt(hex.slice(1), 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    return `rgba(${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}, ${alpha})`;
   }
 
-  // Helper function to convert hex color to RGB
   function hexToRgb(hex) {
     const bigint = parseInt(hex.slice(1), 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return { r, g, b };
+    return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
   }
 
-  // Save Color Table with Custom Filename
+  // ── Save Color Table ──
   function saveColorTable() {
-    const palContent = generatePalContent();
-    const blob = new Blob([palContent], { type: 'text/plain' });
+    if (colorEntries.length === 0) {
+      showToast('No entries to save.', 'error');
+      return;
+    }
+    const content = generatePalContent();
+    const blob = new Blob([content], { type: 'text/plain' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    const filename = document.getElementById('filename').value || 'color_table.pal';
-    link.download = filename;
+    link.download = document.getElementById('filename').value || 'color_table.pal';
     link.click();
+    showToast('Color table saved!', 'success');
   }
 
-  // Generate .pal file content from current settings and entries
   function generatePalContent() {
     let lines = [];
-
-    // Add comments and headers
     lines.push('; Generated Color Table with Tools by Garrett Helms for WxTools.org');
-    if (document.getElementById('product').value) {
-      lines.push(`Product: ${document.getElementById('product').value}`);
-    }
-    if (document.getElementById('units').value) {
-      lines.push(`Units: ${document.getElementById('units').value}`);
-    }
-    if (document.getElementById('scale').value) {
-      lines.push(`Scale: ${document.getElementById('scale').value}`);
-    }
-    if (document.getElementById('offset').value) {
-      lines.push(`Offset: ${document.getElementById('offset').value}`);
-    }
-    if (document.getElementById('step').value) {
-      lines.push(`Step: ${document.getElementById('step').value}`);
-    }
-    if (document.getElementById('rfColor').value) {
-      const rfColor = hexToRgb(document.getElementById('rfColor').value);
-      lines.push(`RF: ${rfColor.r} ${rfColor.g} ${rfColor.b}`);
+
+    const product = document.getElementById('product').value;
+    const units = document.getElementById('units').value;
+    const scale = document.getElementById('scale').value;
+    const offset = document.getElementById('offset').value;
+    const step = document.getElementById('step').value;
+    const rfColor = document.getElementById('rfColor').value;
+
+    if (product) lines.push(`Product: ${product}`);
+    if (units) lines.push(`Units: ${units}`);
+    if (scale) lines.push(`Scale: ${scale}`);
+    if (offset) lines.push(`Offset: ${offset}`);
+    if (step) lines.push(`Step: ${step}`);
+    if (rfColor) {
+      const rf = hexToRgb(rfColor);
+      lines.push(`RF: ${rf.r} ${rf.g} ${rf.b}`);
     }
 
-    lines.push(''); // Add an empty line before entries
+    lines.push('');
 
-    // Add color entries
-    colorEntries.sort((a, b) => a.value - b.value); // Ensure entries are sorted by value
-
-    colorEntries.forEach(entry => {
-      let line = `${entry.type}: ${entry.value} `;
-
-      const startRgb = hexToRgb(entry.startColor);
-      line += `${startRgb.r} ${startRgb.g} ${startRgb.b}`;
-
-      if (entry.type.endsWith('4')) {
-        line += ` ${entry.alpha}`;
-      }
-
+    // Sort entries by value for output
+    const sorted = [...colorEntries].sort((a, b) => a.value - b.value);
+    sorted.forEach(entry => {
+      const s = hexToRgb(entry.startColor);
+      let line = `${entry.type}: ${entry.value} ${s.r} ${s.g} ${s.b}`;
+      if (entry.type.endsWith('4')) line += ` ${entry.alpha}`;
       if (entry.endColor) {
-        const endRgb = hexToRgb(entry.endColor || '#FFFFFF');
-        line += ` ${endRgb.r} ${endRgb.g} ${endRgb.b}`;
-
-        if (entry.type.endsWith('4')) {
-          line += ` ${entry.endAlpha}`;
-        }
+        const e = hexToRgb(entry.endColor);
+        line += ` ${e.r} ${e.g} ${e.b}`;
+        if (entry.type.endsWith('4')) line += ` ${entry.endAlpha}`;
       }
-
       lines.push(line);
     });
 
     return lines.join('\n');
   }
 
-  // Load Color Table from .pal or .txt
+  // ── Load Color Table ──
   function loadColorTable() {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.pal, .txt';
+    input.accept = '.pal,.txt';
     input.onchange = (event) => {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (e) => {
-        const fileContent = e.target.result;
-
         if (file.name.endsWith('.pal') || file.name.endsWith('.txt')) {
-          saveState(); // Save state before making changes
-          loadFromPalData(fileContent);
+          saveState();
+          loadFromPalData(e.target.result);
+          showToast(`Loaded ${file.name}`, 'success');
         } else {
-          alert('Unsupported file format.');
+          showToast('Unsupported file format.', 'error');
         }
       };
       reader.readAsText(file);
@@ -1097,17 +1557,13 @@ Author: Garrett Helms
     document.getElementById('step').value = '';
     document.getElementById('rfColor').value = '#404040';
 
-    const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+    const lines = content.split('\n').map(l => l.trim()).filter(l => l);
 
     lines.forEach((line, index) => {
-      // Remove inline comments
       line = line.split(';')[0].split('//')[0].trim();
-
-      // Skip empty lines after removing comments
       if (!line) return;
 
       try {
-        // Use case-insensitive matching
         if (/^Product:/i.test(line)) {
           document.getElementById('product').value = line.split(':')[1].trim();
         } else if (/^Units:/i.test(line)) {
@@ -1120,17 +1576,16 @@ Author: Garrett Helms
           document.getElementById('step').value = parseFloat(line.split(':')[1].trim());
         } else if (/^RF:/i.test(line)) {
           const rgb = line.split(':')[1].trim().split(/\s+/).map(Number);
-          if (rgb.length >= 3 && rgb.every(num => !isNaN(num) && num >= 0 && num <= 255)) {
+          if (rgb.length >= 3 && rgb.every(n => !isNaN(n) && n >= 0 && n <= 255)) {
             document.getElementById('rfColor').value = `#${((1 << 24) | (rgb[0] << 16) | (rgb[1] << 8) | rgb[2]).toString(16).slice(1).toUpperCase()}`;
           } else {
-            alert(`Invalid RF color values on line ${index + 1}. Expected three integers between 0-255.`);
+            showToast(`Invalid RF color on line ${index + 1}`, 'error');
           }
         } else if (/^(SolidColor4|SolidColor|Color4|Color):/i.test(line) || /^[0-9]/.test(line)) {
-          // Handle color lines with or without explicit type
           parseColorLine(line, index + 1);
         }
       } catch (error) {
-        alert(`Error parsing line ${index + 1}: ${line}\n${error.message}`);
+        showToast(`Error on line ${index + 1}: ${error.message}`, 'error');
       }
     });
 
@@ -1139,74 +1594,50 @@ Author: Garrett Helms
   }
 
   function parseColorLine(line, lineNumber) {
-    // Remove inline comments
     line = line.split(';')[0].split('//')[0].trim();
 
-    // Extract type if present, case-insensitive
     let typeMatch = line.match(/^(SolidColor4|SolidColor|Color4|Color):/i);
     let type = typeMatch ? typeMatch[1] : null;
-
-    // Remove type from line if present
     let contentPart = typeMatch ? line.slice(typeMatch[0].length).trim() : line.trim();
+    const tokens = contentPart.split(/\s+/).map(t => t.trim());
 
-    // Split the content part into tokens
-    const tokens = contentPart.split(/\s+/).map(token => token.trim());
-
-    // Normalize the type to match the expected format (capitalize first letter)
     if (type) {
       type = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+      // Fix casing for known types
+      if (type === 'Solidcolor') type = 'SolidColor';
+      if (type === 'Solidcolor4') type = 'SolidColor4';
+      if (type === 'Color4') type = 'Color4';
     }
 
-    // Determine if the type includes alpha based on '4' suffix
     let hasAlpha = false;
     if (type) {
       hasAlpha = type.endsWith('4');
     } else {
-      // Infer type based on number of tokens
-      if (tokens.length === 5 || tokens.length === 9) {
-        hasAlpha = true;
-      }
+      hasAlpha = (tokens.length === 5 || tokens.length === 9);
     }
 
-    // Determine the number of color values to check for gradient
     const colorValueCount = hasAlpha ? 4 : 3;
-
-    // Determine if it's a gradient based on the number of tokens
     const isGradient = tokens.length === (1 + colorValueCount * 2);
 
-    // Infer type if not specified
     if (!type) {
-      if (isGradient) {
-        type = hasAlpha ? 'Color4' : 'Color';
-      } else {
-        type = hasAlpha ? 'SolidColor4' : 'SolidColor';
-      }
+      type = isGradient
+        ? (hasAlpha ? 'Color4' : 'Color')
+        : (hasAlpha ? 'SolidColor4' : 'SolidColor');
     }
 
-    let value, r1, g1, b1, a1 = 1, r2, g2, b2, a2 = 1;
-    value = parseFloat(tokens[0]);
+    const value = parseFloat(tokens[0]);
+    const r1 = parseInt(tokens[1]), g1 = parseInt(tokens[2]), b1 = parseInt(tokens[3]);
+    const a1 = hasAlpha ? parseFloat(tokens[4]) : 1;
 
-    r1 = parseInt(tokens[1]);
-    g1 = parseInt(tokens[2]);
-    b1 = parseInt(tokens[3]);
-
-    if (hasAlpha) {
-      a1 = parseFloat(tokens[4]);
-    }
-
-    let idx = 1 + colorValueCount;
-
+    let r2, g2, b2, a2 = 1;
     if (isGradient) {
+      const idx = 1 + colorValueCount;
       r2 = parseInt(tokens[idx]);
       g2 = parseInt(tokens[idx + 1]);
       b2 = parseInt(tokens[idx + 2]);
-
-      if (hasAlpha) {
-        a2 = parseFloat(tokens[idx + 3]);
-      }
+      if (hasAlpha) a2 = parseFloat(tokens[idx + 3]);
     }
 
-    // Validate values
     if (isNaN(value) || isNaN(r1) || isNaN(g1) || isNaN(b1) || (hasAlpha && isNaN(a1))) {
       throw new Error(`Invalid values on line ${lineNumber}.`);
     }
@@ -1215,88 +1646,33 @@ Author: Garrett Helms
     }
 
     const startColor = `#${((1 << 24) | (r1 << 16) | (g1 << 8) | b1).toString(16).slice(1).toUpperCase()}`;
-    const startAlpha = hasAlpha ? a1 : 1;
-
-    let endColor = null;
-    let endAlpha = 1;
-
-    if (isGradient) {
-      endColor = `#${((1 << 24) | (r2 << 16) | (g2 << 8) | b2).toString(16).slice(1).toUpperCase()}`;
-      endAlpha = hasAlpha ? a2 : 1;
-    }
+    const endColor = isGradient
+      ? `#${((1 << 24) | (r2 << 16) | (g2 << 8) | b2).toString(16).slice(1).toUpperCase()}`
+      : null;
 
     const newId = colorEntries.length > 0 ? Math.max(...colorEntries.map(e => e.id)) + 1 : 0;
-
     colorEntries.push({
       id: newId,
       type,
       value,
       startColor,
-      alpha: startAlpha,
+      alpha: hasAlpha ? a1 : 1,
       endColor,
-      endAlpha
+      endAlpha: isGradient && hasAlpha ? a2 : 1
     });
   }
 
-  // Update preview when RF Color changes
+  // ── Event Listeners ──
   document.getElementById('rfColor').addEventListener('input', () => {
-    saveState(); // Save state before making changes
     updatePreview();
   });
+  document.getElementById('rfColor').addEventListener('change', saveState);
 
-  // Save state when settings change
-  const settingsInputs = ['product', 'units', 'scale', 'offset', 'step', 'filename'];
-  settingsInputs.forEach(id => {
+  ['product', 'units', 'scale', 'offset', 'step', 'filename'].forEach(id => {
     document.getElementById(id).addEventListener('change', saveState);
   });
 
-  // Function to handle clicks on the preview canvas
-  function handlePreviewCanvasClick(event) {
-    const canvas = document.getElementById('previewCanvas');
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-
-    // Calculate the width and identify the clicked entry
-    const sortedEntries = [...colorEntries].sort((a, b) => a.value - b.value);
-    const minVal = sortedEntries[0].value;
-    const maxVal = sortedEntries[sortedEntries.length - 1].value;
-    const width = canvas.width;
-    const range = maxVal - minVal || 1;
-
-    // Find the entry corresponding to the click position
-    let clickedEntry = null;
-    sortedEntries.some((entry, index) => {
-      const entryXPos = ((entry.value - minVal) / range) * width;
-      const nextEntryXPos = (index < sortedEntries.length - 1)
-        ? ((sortedEntries[index + 1].value - minVal) / range) * width
-        : width;
-
-      if (x >= entryXPos && x <= nextEntryXPos) {
-        clickedEntry = entry;
-        return true;
-      }
-      return false;
-    });
-
-    if (clickedEntry) {
-      // Find and scroll to the color entry element
-      const entryDiv = document.querySelector(`.color-entry[data-id="${clickedEntry.id}"]`);
-      if (entryDiv) {
-        // Remove highlight class from any other entries
-        document.querySelectorAll('.highlight-scroll').forEach(el => el.classList.remove('highlight-scroll'));
-        
-        // Scroll to the clicked entry and highlight it
-        entryDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        entryDiv.classList.add('highlight-scroll');
-        setTimeout(() => entryDiv.classList.remove('highlight-scroll'), 1500);
-      }
-    }
-  }
-
-  // Add event listener for click on the preview canvas
-  document.getElementById('previewCanvas').addEventListener('click', handlePreviewCanvasClick);
-
-  // Initial render and save state
+  // ── Initial Render ──
   renderEntries();
   updatePreview();
   saveState();
