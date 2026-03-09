@@ -8,7 +8,7 @@
 /*
 Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) 
 
-Copyright (c) 2024-2025 Garrett Helms
+Copyright (c) 2024-2026 Garrett Helms
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, and modify the Software, provided that the following conditions are met:
 
@@ -377,6 +377,53 @@ body {
   transition: border-color 0.2s;
 }
 .entry-field input[type="color"]:hover { border-color: var(--accent); }
+.entry-field input[type="text"].hex-input {
+  width: 74px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+  text-transform: uppercase;
+  outline: none;
+  transition: all 0.2s;
+}
+.entry-field input[type="text"].hex-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+.color-with-hex {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.form-field .color-with-hex input[type="color"] {
+  width: 44px;
+  height: 38px;
+  padding: 3px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.form-field .color-with-hex input[type="text"].hex-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+  text-transform: uppercase;
+  outline: none;
+  transition: all 0.2s;
+}
+.form-field .color-with-hex input[type="text"].hex-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
 .entry-gradient-preview {
   width: 60px;
   height: 20px;
@@ -577,6 +624,148 @@ body {
   .color-entry { flex-wrap: wrap; padding: 10px; }
   .entries-toolbar { padding: 10px 14px; }
 }
+
+/* ── Color Swatch Button ── */
+.color-swatch-btn {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.color-swatch-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+.form-field .color-with-hex .color-swatch-btn {
+  width: 44px;
+  height: 38px;
+  flex-shrink: 0;
+}
+.entry-field .color-swatch-btn {
+  width: 30px;
+  height: 30px;
+  border-width: 2px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+/* ── Custom Color Picker Popup ── */
+.cpicker-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+.cpicker {
+  position: fixed;
+  z-index: 301;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  width: 280px;
+  display: none;
+}
+.cpicker.open { display: block; }
+.cpicker-sv {
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-sm);
+  cursor: crosshair;
+  position: relative;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.cpicker-sv canvas { display: block; width: 100%; height: 100%; border-radius: var(--radius-sm); }
+.cpicker-sv-cursor {
+  position: absolute;
+  width: 14px; height: 14px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(0,0,0,0.3);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.cpicker-hue-wrap {
+  width: 100%;
+  height: 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 12px;
+}
+.cpicker-hue-wrap canvas { display: block; width: 100%; height: 100%; border-radius: 7px; }
+.cpicker-hue-cursor {
+  position: absolute;
+  top: -1px;
+  width: 6px; height: 16px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.3);
+  border-radius: 3px;
+  pointer-events: none;
+  transform: translateX(-50%);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.cpicker-hex-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cpicker-hex-row .cpicker-swatch {
+  width: 28px; height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cpicker-hex-row input[type="text"] {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+  text-transform: uppercase;
+  outline: none;
+}
+.cpicker-hex-row input[type="text"]:focus { border-color: var(--accent); }
+.cpicker-rgb {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.cpicker-rgb .cpf { display: flex; flex-direction: column; gap: 2px; }
+.cpicker-rgb label { font-size: 0.68rem; color: var(--text-muted); text-align: center; font-weight: 600; }
+.cpicker-rgb input {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-family: var(--font);
+  text-align: center;
+  outline: none;
+}
+.cpicker-rgb input:focus { border-color: var(--accent); }
+.cpicker-preview {
+  display: flex;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.cpicker-preview > div { flex: 1; }
+.cpicker-footer { display: flex; gap: 6px; justify-content: flex-end; }
+.cpicker-footer .cpicker-edrop { margin-right: auto; }
   </style>
 </head>
 <body>
@@ -622,8 +811,12 @@ body {
           <input type="number" id="step" step="0.01" placeholder="e.g. 5.0">
         </div>
         <div class="form-field">
-          <label for="rfColor">RF Color</label>
-          <input type="color" id="rfColor" value="#404040">
+          <label>RF Color</label>
+          <div class="color-with-hex">
+            <button type="button" class="color-swatch-btn" id="rfColorBtn" style="background:#404040" onclick="openFormColorPicker('rfColorBtn','rfColor','rfColorHex')"></button>
+            <input type="hidden" id="rfColor" value="#404040">
+            <input type="text" id="rfColorHex" class="hex-input" value="#404040" maxlength="7" placeholder="#RRGGBB" oninput="formHexSync('rfColorHex','rfColor','rfColorBtn')" onchange="saveState()">
+          </div>
         </div>
         <div class="form-field">
           <label for="filename">Filename</label>
@@ -690,19 +883,27 @@ body {
     </div>
     <div class="form-field">
       <label for="startColor">Start Color</label>
-      <input type="color" id="startColor" value="#ffffff">
+      <div class="color-with-hex">
+        <button type="button" class="color-swatch-btn" id="startColorBtn" style="background:#ffffff" onclick="openFormColorPicker('startColorBtn','startColor','startColorHex')"></button>
+        <input type="hidden" id="startColor" value="#ffffff">
+        <input type="text" id="startColorHex" class="hex-input" value="#FFFFFF" maxlength="7" placeholder="#RRGGBB" oninput="formHexSync('startColorHex','startColor','startColorBtn')">
+      </div>
     </div>
     <div class="form-field" id="startAlphaGroup" style="display:none">
-      <label for="startAlpha">Start Alpha (0–1)</label>
-      <input type="number" id="startAlpha" step="0.01" min="0" max="1" value="1">
+      <label for="startAlpha">Start Alpha (0–255)</label>
+      <input type="number" id="startAlpha" step="1" min="0" max="255" value="255">
     </div>
     <div class="form-field" id="endColorGroup" style="display:none">
       <label for="endColor">End Color</label>
-      <input type="color" id="endColor" value="#ffffff">
+      <div class="color-with-hex">
+        <button type="button" class="color-swatch-btn" id="endColorBtn" style="background:#ffffff" onclick="openFormColorPicker('endColorBtn','endColor','endColorHex')"></button>
+        <input type="hidden" id="endColor" value="#ffffff">
+        <input type="text" id="endColorHex" class="hex-input" value="#FFFFFF" maxlength="7" placeholder="#RRGGBB" oninput="formHexSync('endColorHex','endColor','endColorBtn')">
+      </div>
     </div>
     <div class="form-field" id="endAlphaGroup" style="display:none">
-      <label for="endAlpha">End Alpha (0–1)</label>
-      <input type="number" id="endAlpha" step="0.01" min="0" max="1" value="1">
+      <label for="endAlpha">End Alpha (0–255)</label>
+      <input type="number" id="endAlpha" step="1" min="0" max="255" value="255">
     </div>
   </div>
   <div class="form-panel-footer">
@@ -711,12 +912,43 @@ body {
   </div>
 </div>
 
+<!-- Custom Color Picker -->
+<div class="cpicker-overlay" id="cpickerOverlay"></div>
+<div class="cpicker" id="cpicker">
+  <div class="cpicker-sv" id="cpickerSV">
+    <canvas id="cpickerSVCanvas"></canvas>
+    <div class="cpicker-sv-cursor" id="cpickerSVCursor"></div>
+  </div>
+  <div class="cpicker-hue-wrap" id="cpickerHueWrap">
+    <canvas id="cpickerHueCanvas"></canvas>
+    <div class="cpicker-hue-cursor" id="cpickerHueCursor"></div>
+  </div>
+  <div class="cpicker-hex-row">
+    <div class="cpicker-swatch" id="cpickerSwatch"></div>
+    <input type="text" id="cpickerHex" maxlength="7" placeholder="#RRGGBB">
+  </div>
+  <div class="cpicker-rgb">
+    <div class="cpf"><label>R</label><input type="number" id="cpickerR" min="0" max="255"></div>
+    <div class="cpf"><label>G</label><input type="number" id="cpickerG" min="0" max="255"></div>
+    <div class="cpf"><label>B</label><input type="number" id="cpickerB" min="0" max="255"></div>
+  </div>
+  <div class="cpicker-preview">
+    <div id="cpickerOld" title="Original"></div>
+    <div id="cpickerNew" title="New"></div>
+  </div>
+  <div class="cpicker-footer">
+    <button class="btn btn-ghost btn-sm cpicker-edrop" id="cpickerEyedrop" title="Pick color from screen">🎯 Eyedropper</button>
+    <button class="btn btn-ghost btn-sm" onclick="cpickerCancel()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="cpickerApply()">Apply</button>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- Footer with Social Media Icons -->
 <div class="app-footer">
-  &copy; 2024-2025 Garrett Helms. All rights reserved.
+  &copy; 2024-2026 Garrett Helms. All rights reserved.
   <div class="social-icons">
     <a href="https://x.com/WxGareBear" target="_blank" aria-label="Twitter/X">
       <!-- Twitter/X SVG Icon -->
@@ -854,6 +1086,250 @@ body {
     }
   }
 
+  // ── Utility: Hex validation ──
+  function isValidHex(str) {
+    return /^#[0-9A-Fa-f]{6}$/.test(str);
+  }
+
+  // ── Form panel helpers ──
+  function formHexSync(hexId, hiddenId, btnId) {
+    const val = document.getElementById(hexId).value;
+    if (isValidHex(val)) {
+      document.getElementById(hiddenId).value = val;
+      document.getElementById(btnId).style.background = val;
+    }
+  }
+  function openFormColorPicker(btnId, hiddenId, hexId) {
+    const btn = document.getElementById(btnId);
+    const currentColor = document.getElementById(hiddenId).value;
+    openColorPicker(btn, currentColor, function(color) {
+      document.getElementById(hiddenId).value = color;
+      btn.style.background = color;
+      document.getElementById(hexId).value = color.toUpperCase();
+      if (hiddenId === 'rfColor') updatePreview();
+    });
+  }
+
+  // ── Custom Color Picker ──
+  const cpState = { h: 0, s: 1, v: 1, originalColor: '#ffffff', callback: null, triggerEl: null };
+
+  function hsvToRgb(h, s, v) {
+    let r, g, b;
+    const i = Math.floor(h * 6);
+    const f = h * 6 - i;
+    const p = v * (1 - s);
+    const q = v * (1 - f * s);
+    const t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+      case 0: r = v; g = t; b = p; break;
+      case 1: r = q; g = v; b = p; break;
+      case 2: r = p; g = v; b = t; break;
+      case 3: r = p; g = q; b = v; break;
+      case 4: r = t; g = p; b = v; break;
+      case 5: r = v; g = p; b = q; break;
+    }
+    return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+  }
+
+  function rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const d = max - min;
+    let h, s = max === 0 ? 0 : d / max, v = max;
+    if (d === 0) h = 0;
+    else {
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+    return { h, s, v };
+  }
+
+  function rgbToHex(r, g, b) {
+    return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toUpperCase();
+  }
+
+  function cpickerDrawSV() {
+    const canvas = document.getElementById('cpickerSVCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width = canvas.offsetWidth;
+    const h = canvas.height = canvas.offsetHeight;
+    const hueRgb = hsvToRgb(cpState.h, 1, 1);
+    const hueColor = `rgb(${hueRgb.r},${hueRgb.g},${hueRgb.b})`;
+    // White to hue gradient (horizontal)
+    const gradH = ctx.createLinearGradient(0, 0, w, 0);
+    gradH.addColorStop(0, '#fff');
+    gradH.addColorStop(1, hueColor);
+    ctx.fillStyle = gradH;
+    ctx.fillRect(0, 0, w, h);
+    // Transparent to black gradient (vertical)
+    const gradV = ctx.createLinearGradient(0, 0, 0, h);
+    gradV.addColorStop(0, 'rgba(0,0,0,0)');
+    gradV.addColorStop(1, '#000');
+    ctx.fillStyle = gradV;
+    ctx.fillRect(0, 0, w, h);
+    // Position cursor
+    const cursor = document.getElementById('cpickerSVCursor');
+    cursor.style.left = (cpState.s * 100) + '%';
+    cursor.style.top = ((1 - cpState.v) * 100) + '%';
+  }
+
+  function cpickerDrawHue() {
+    const canvas = document.getElementById('cpickerHueCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width = canvas.offsetWidth;
+    const h = canvas.height = canvas.offsetHeight;
+    const grad = ctx.createLinearGradient(0, 0, w, 0);
+    for (let i = 0; i <= 6; i++) {
+      const rgb = hsvToRgb(i / 6, 1, 1);
+      grad.addColorStop(i / 6, `rgb(${rgb.r},${rgb.g},${rgb.b})`);
+    }
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    const cursor = document.getElementById('cpickerHueCursor');
+    cursor.style.left = (cpState.h * 100) + '%';
+  }
+
+  function cpickerUpdateUI() {
+    const rgb = hsvToRgb(cpState.h, cpState.s, cpState.v);
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    document.getElementById('cpickerHex').value = hex;
+    document.getElementById('cpickerR').value = rgb.r;
+    document.getElementById('cpickerG').value = rgb.g;
+    document.getElementById('cpickerB').value = rgb.b;
+    document.getElementById('cpickerSwatch').style.background = hex;
+    document.getElementById('cpickerNew').style.background = hex;
+    cpickerDrawSV();
+    cpickerDrawHue();
+  }
+
+  function openColorPicker(triggerEl, currentColor, callback) {
+    cpState.callback = callback;
+    cpState.triggerEl = triggerEl;
+    cpState.originalColor = currentColor;
+    const rgb = hexToRgb(currentColor);
+    const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+    cpState.h = hsv.h; cpState.s = hsv.s; cpState.v = hsv.v;
+    document.getElementById('cpickerOld').style.background = currentColor;
+    const picker = document.getElementById('cpicker');
+    const overlay = document.getElementById('cpickerOverlay');
+    // Position near trigger
+    const rect = triggerEl.getBoundingClientRect();
+    let top = rect.bottom + 6;
+    let left = rect.left;
+    if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
+    if (top + 420 > window.innerHeight) top = rect.top - 420;
+    if (left < 4) left = 4;
+    if (top < 4) top = 4;
+    picker.style.top = top + 'px';
+    picker.style.left = left + 'px';
+    overlay.style.display = 'block';
+    picker.classList.add('open');
+    cpickerUpdateUI();
+  }
+
+  function cpickerClose() {
+    document.getElementById('cpicker').classList.remove('open');
+    document.getElementById('cpickerOverlay').style.display = 'none';
+    cpState.callback = null;
+  }
+
+  function cpickerApply() {
+    const rgb = hsvToRgb(cpState.h, cpState.s, cpState.v);
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    if (cpState.callback) cpState.callback(hex);
+    saveState();
+    cpickerClose();
+  }
+
+  function cpickerCancel() {
+    cpickerClose();
+  }
+
+  // SV canvas interaction
+  (function() {
+    const svArea = document.getElementById('cpickerSV');
+    let dragging = false;
+    function updateSV(e) {
+      const rect = svArea.getBoundingClientRect();
+      const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+      cpState.s = x;
+      cpState.v = 1 - y;
+      cpickerUpdateUI();
+    }
+    svArea.addEventListener('mousedown', (e) => { dragging = true; updateSV(e); });
+    window.addEventListener('mousemove', (e) => { if (dragging) updateSV(e); });
+    window.addEventListener('mouseup', () => { dragging = false; });
+    svArea.addEventListener('touchstart', (e) => { e.preventDefault(); dragging = true; updateSV(e.touches[0]); }, { passive: false });
+    svArea.addEventListener('touchmove', (e) => { e.preventDefault(); if (dragging) updateSV(e.touches[0]); }, { passive: false });
+    svArea.addEventListener('touchend', () => { dragging = false; });
+  })();
+
+  // Hue bar interaction
+  (function() {
+    const hueWrap = document.getElementById('cpickerHueWrap');
+    let dragging = false;
+    function updateHue(e) {
+      const rect = hueWrap.getBoundingClientRect();
+      cpState.h = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      cpickerUpdateUI();
+    }
+    hueWrap.addEventListener('mousedown', (e) => { dragging = true; updateHue(e); });
+    window.addEventListener('mousemove', (e) => { if (dragging) updateHue(e); });
+    window.addEventListener('mouseup', () => { dragging = false; });
+    hueWrap.addEventListener('touchstart', (e) => { e.preventDefault(); dragging = true; updateHue(e.touches[0]); }, { passive: false });
+    hueWrap.addEventListener('touchmove', (e) => { e.preventDefault(); if (dragging) updateHue(e.touches[0]); }, { passive: false });
+    hueWrap.addEventListener('touchend', () => { dragging = false; });
+  })();
+
+  // Hex input in picker
+  document.getElementById('cpickerHex').addEventListener('input', function() {
+    if (isValidHex(this.value)) {
+      const rgb = hexToRgb(this.value);
+      const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+      cpState.h = hsv.h; cpState.s = hsv.s; cpState.v = hsv.v;
+      cpickerUpdateUI();
+    }
+  });
+
+  // RGB inputs in picker
+  ['cpickerR', 'cpickerG', 'cpickerB'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+      const r = parseInt(document.getElementById('cpickerR').value) || 0;
+      const g = parseInt(document.getElementById('cpickerG').value) || 0;
+      const b = parseInt(document.getElementById('cpickerB').value) || 0;
+      const hsv = rgbToHsv(Math.min(255, Math.max(0, r)), Math.min(255, Math.max(0, g)), Math.min(255, Math.max(0, b)));
+      cpState.h = hsv.h; cpState.s = hsv.s; cpState.v = hsv.v;
+      cpickerUpdateUI();
+    });
+  });
+
+  // Eyedropper button
+  (function() {
+    const btn = document.getElementById('cpickerEyedrop');
+    if (!('EyeDropper' in window)) {
+      btn.style.display = 'none';
+    } else {
+      btn.addEventListener('click', async function() {
+        try {
+          const dropper = new EyeDropper();
+          const result = await dropper.open();
+          const hex = result.sRGBHex.toUpperCase();
+          const rgb = hexToRgb(hex);
+          const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+          cpState.h = hsv.h; cpState.s = hsv.s; cpState.v = hsv.v;
+          cpickerUpdateUI();
+        } catch (e) { /* user cancelled */ }
+      });
+    }
+  })();
+
+  // Close picker on overlay click
+  document.getElementById('cpickerOverlay').addEventListener('click', cpickerCancel);
+
   // ── Dark Mode ──
   function toggleDarkMode() {
     isDarkMode = !isDarkMode;
@@ -888,9 +1364,13 @@ body {
     document.getElementById('entryType').value = 'SolidColor';
     document.getElementById('entryValue').value = '';
     document.getElementById('startColor').value = '#ffffff';
-    document.getElementById('startAlpha').value = '1';
+    document.getElementById('startColorBtn').style.background = '#ffffff';
+    document.getElementById('startColorHex').value = '#FFFFFF';
+    document.getElementById('startAlpha').value = '255';
     document.getElementById('endColor').value = '#ffffff';
-    document.getElementById('endAlpha').value = '1';
+    document.getElementById('endColorBtn').style.background = '#ffffff';
+    document.getElementById('endColorHex').value = '#FFFFFF';
+    document.getElementById('endAlpha').value = '255';
     toggleEntryFields();
     openFormPanel();
   }
@@ -903,9 +1383,13 @@ body {
     document.getElementById('entryType').value = entry.type;
     document.getElementById('entryValue').value = entry.value;
     document.getElementById('startColor').value = entry.startColor;
+    document.getElementById('startColorBtn').style.background = entry.startColor;
+    document.getElementById('startColorHex').value = entry.startColor.toUpperCase();
     document.getElementById('startAlpha').value = entry.alpha;
     document.getElementById('endColor').value = entry.endColor || '#ffffff';
-    document.getElementById('endAlpha').value = entry.endAlpha || '1';
+    document.getElementById('endColorBtn').style.background = entry.endColor || '#ffffff';
+    document.getElementById('endColorHex').value = (entry.endColor || '#ffffff').toUpperCase();
+    document.getElementById('endAlpha').value = entry.endAlpha || '255';
     toggleEntryFields();
     openFormPanel();
   }
@@ -948,6 +1432,8 @@ body {
       document.getElementById('offset').value = prev.settings.offset;
       document.getElementById('step').value = prev.settings.step;
       document.getElementById('rfColor').value = prev.settings.rfColor;
+      document.getElementById('rfColorBtn').style.background = prev.settings.rfColor;
+      document.getElementById('rfColorHex').value = prev.settings.rfColor.toUpperCase();
       document.getElementById('filename').value = prev.settings.filename;
       if (prev.settings.darkMode !== isDarkMode) toggleDarkMode();
       renderEntries();
@@ -973,16 +1459,16 @@ body {
     const type = document.getElementById('entryType').value;
     const value = parseFloat(document.getElementById('entryValue').value);
     const startColor = document.getElementById('startColor').value;
-    const alpha = type.endsWith('4') ? parseFloat(document.getElementById('startAlpha').value) : 1;
+    const alpha = type.endsWith('4') ? parseInt(document.getElementById('startAlpha').value) : 255;
     const endColor = type.startsWith('Color') ? document.getElementById('endColor').value : null;
-    const endAlpha = (type === 'Color4') ? parseFloat(document.getElementById('endAlpha').value) : 1;
+    const endAlpha = (type === 'Color4') ? parseInt(document.getElementById('endAlpha').value) : 255;
 
     if (isNaN(value)) { showToast('Please enter a valid value.', 'error'); return; }
-    if (type.endsWith('4') && (isNaN(alpha) || alpha < 0 || alpha > 1)) {
-      showToast('Start Alpha must be between 0 and 1.', 'error'); return;
+    if (type.endsWith('4') && (isNaN(alpha) || alpha < 0 || alpha > 255)) {
+      showToast('Start Alpha must be between 0 and 255.', 'error'); return;
     }
-    if (type === 'Color4' && (isNaN(endAlpha) || endAlpha < 0 || endAlpha > 1)) {
-      showToast('End Alpha must be between 0 and 1.', 'error'); return;
+    if (type === 'Color4' && (isNaN(endAlpha) || endAlpha < 0 || endAlpha > 255)) {
+      showToast('End Alpha must be between 0 and 255.', 'error'); return;
     }
 
     saveState();
@@ -1175,7 +1661,12 @@ body {
       valInput.onchange = function() {
         saveState();
         entry.value = parseFloat(this.value);
+        colorEntries.sort((a, b) => a.value - b.value);
+        renderEntries();
         updatePreview();
+        // Scroll the changed entry into view
+        const moved = document.querySelector(`.color-entry[data-id='${entry.id}']`);
+        if (moved) { moved.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); moved.classList.add('highlight-entry'); }
       };
       valField.appendChild(valLabel);
       valField.appendChild(valInput);
@@ -1186,20 +1677,43 @@ body {
       startField.className = 'entry-field';
       const startLabel = document.createElement('label');
       startLabel.textContent = 'Start';
-      const startInput = document.createElement('input');
-      startInput.type = 'color';
-      startInput.value = entry.startColor;
-      startInput.title = `RGB: ${hexToRgb(entry.startColor).r}, ${hexToRgb(entry.startColor).g}, ${hexToRgb(entry.startColor).b}`;
-      startInput.oninput = function() {
-        entry.startColor = this.value;
-        bar.style.background = entry.endColor
-          ? `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`
-          : entry.startColor;
-        updatePreview();
+      const startBtn = document.createElement('button');
+      startBtn.type = 'button';
+      startBtn.className = 'color-swatch-btn';
+      startBtn.style.background = entry.startColor;
+      startBtn.title = `RGB: ${hexToRgb(entry.startColor).r}, ${hexToRgb(entry.startColor).g}, ${hexToRgb(entry.startColor).b}`;
+      const startHexInput = document.createElement('input');
+      startHexInput.type = 'text';
+      startHexInput.className = 'hex-input';
+      startHexInput.value = entry.startColor.toUpperCase();
+      startHexInput.maxLength = 7;
+      startHexInput.placeholder = '#RRGGBB';
+      startBtn.onclick = function() {
+        openColorPicker(startBtn, entry.startColor, function(color) {
+          entry.startColor = color;
+          startBtn.style.background = color;
+          startBtn.title = `RGB: ${hexToRgb(color).r}, ${hexToRgb(color).g}, ${hexToRgb(color).b}`;
+          startHexInput.value = color.toUpperCase();
+          bar.style.background = entry.endColor
+            ? `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`
+            : entry.startColor;
+          updatePreview();
+        });
       };
-      startInput.onchange = function() { saveState(); };
+      startHexInput.oninput = function() {
+        if (isValidHex(this.value)) {
+          entry.startColor = this.value;
+          startBtn.style.background = this.value;
+          bar.style.background = entry.endColor
+            ? `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`
+            : entry.startColor;
+          updatePreview();
+        }
+      };
+      startHexInput.onchange = function() { saveState(); };
       startField.appendChild(startLabel);
-      startField.appendChild(startInput);
+      startField.appendChild(startBtn);
+      startField.appendChild(startHexInput);
       info.appendChild(startField);
 
       // Start alpha
@@ -1210,14 +1724,14 @@ body {
         aLabel.textContent = 'α';
         const aInput = document.createElement('input');
         aInput.type = 'number';
-        aInput.step = '0.01';
+        aInput.step = '1';
         aInput.min = '0';
-        aInput.max = '1';
+        aInput.max = '255';
         aInput.value = entry.alpha;
         aInput.style.width = '52px';
         aInput.onchange = function() {
           saveState();
-          entry.alpha = parseFloat(this.value);
+          entry.alpha = parseInt(this.value);
           updatePreview();
         };
         alphaField.appendChild(aLabel);
@@ -1231,18 +1745,39 @@ body {
         endField.className = 'entry-field';
         const endLabel = document.createElement('label');
         endLabel.textContent = 'End';
-        const endInput = document.createElement('input');
-        endInput.type = 'color';
-        endInput.value = entry.endColor;
-        endInput.title = `RGB: ${hexToRgb(entry.endColor).r}, ${hexToRgb(entry.endColor).g}, ${hexToRgb(entry.endColor).b}`;
-        endInput.oninput = function() {
-          entry.endColor = this.value;
-          bar.style.background = `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`;
-          updatePreview();
+        const endBtn = document.createElement('button');
+        endBtn.type = 'button';
+        endBtn.className = 'color-swatch-btn';
+        endBtn.style.background = entry.endColor;
+        endBtn.title = `RGB: ${hexToRgb(entry.endColor).r}, ${hexToRgb(entry.endColor).g}, ${hexToRgb(entry.endColor).b}`;
+        const endHexInput = document.createElement('input');
+        endHexInput.type = 'text';
+        endHexInput.className = 'hex-input';
+        endHexInput.value = entry.endColor.toUpperCase();
+        endHexInput.maxLength = 7;
+        endHexInput.placeholder = '#RRGGBB';
+        endBtn.onclick = function() {
+          openColorPicker(endBtn, entry.endColor, function(color) {
+            entry.endColor = color;
+            endBtn.style.background = color;
+            endBtn.title = `RGB: ${hexToRgb(color).r}, ${hexToRgb(color).g}, ${hexToRgb(color).b}`;
+            endHexInput.value = color.toUpperCase();
+            bar.style.background = `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`;
+            updatePreview();
+          });
         };
-        endInput.onchange = function() { saveState(); };
+        endHexInput.oninput = function() {
+          if (isValidHex(this.value)) {
+            entry.endColor = this.value;
+            endBtn.style.background = this.value;
+            bar.style.background = `linear-gradient(to bottom, ${entry.startColor}, ${entry.endColor})`;
+            updatePreview();
+          }
+        };
+        endHexInput.onchange = function() { saveState(); };
         endField.appendChild(endLabel);
-        endField.appendChild(endInput);
+        endField.appendChild(endBtn);
+        endField.appendChild(endHexInput);
         info.appendChild(endField);
 
         // Gradient preview chip
@@ -1259,14 +1794,14 @@ body {
           eaLabel.textContent = 'α₂';
           const eaInput = document.createElement('input');
           eaInput.type = 'number';
-          eaInput.step = '0.01';
+          eaInput.step = '1';
           eaInput.min = '0';
-          eaInput.max = '1';
+          eaInput.max = '255';
           eaInput.value = entry.endAlpha;
           eaInput.style.width = '52px';
           eaInput.onchange = function() {
             saveState();
-            entry.endAlpha = parseFloat(this.value);
+            entry.endAlpha = parseInt(this.value);
             updatePreview();
           };
           eaField.appendChild(eaLabel);
@@ -1408,7 +1943,7 @@ body {
 
     // RF color overlay
     const rfColor = document.getElementById('rfColor').value;
-    ctx.fillStyle = rgbaColor(rfColor, 0.3);
+    ctx.fillStyle = rgbaColor(rfColor, 77);
     ctx.fillRect(0, 0, width, height);
   }
 
@@ -1462,7 +1997,7 @@ body {
   // ── Utility ──
   function rgbaColor(hex, alpha) {
     const bigint = parseInt(hex.slice(1), 16);
-    return `rgba(${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}, ${alpha})`;
+    return `rgba(${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}, ${alpha / 255})`;
   }
 
   function hexToRgb(hex) {
@@ -1556,6 +2091,8 @@ body {
     document.getElementById('offset').value = '';
     document.getElementById('step').value = '';
     document.getElementById('rfColor').value = '#404040';
+    document.getElementById('rfColorBtn').style.background = '#404040';
+    document.getElementById('rfColorHex').value = '#404040';
 
     const lines = content.split('\n').map(l => l.trim()).filter(l => l);
 
@@ -1577,7 +2114,10 @@ body {
         } else if (/^RF:/i.test(line)) {
           const rgb = line.split(':')[1].trim().split(/\s+/).map(Number);
           if (rgb.length >= 3 && rgb.every(n => !isNaN(n) && n >= 0 && n <= 255)) {
-            document.getElementById('rfColor').value = `#${((1 << 24) | (rgb[0] << 16) | (rgb[1] << 8) | rgb[2]).toString(16).slice(1).toUpperCase()}`;
+            const rfHex = `#${((1 << 24) | (rgb[0] << 16) | (rgb[1] << 8) | rgb[2]).toString(16).slice(1).toUpperCase()}`;
+            document.getElementById('rfColor').value = rfHex;
+            document.getElementById('rfColorBtn').style.background = rfHex;
+            document.getElementById('rfColorHex').value = rfHex;
           } else {
             showToast(`Invalid RF color on line ${index + 1}`, 'error');
           }
@@ -1627,15 +2167,19 @@ body {
 
     const value = parseFloat(tokens[0]);
     const r1 = parseInt(tokens[1]), g1 = parseInt(tokens[2]), b1 = parseInt(tokens[3]);
-    const a1 = hasAlpha ? parseFloat(tokens[4]) : 1;
+    const a1raw = hasAlpha ? parseFloat(tokens[4]) : 255;
+    const a1 = (hasAlpha && a1raw <= 1 && tokens[4].includes('.')) ? Math.round(a1raw * 255) : Math.round(a1raw);
 
-    let r2, g2, b2, a2 = 1;
+    let r2, g2, b2, a2 = 255;
     if (isGradient) {
       const idx = 1 + colorValueCount;
       r2 = parseInt(tokens[idx]);
       g2 = parseInt(tokens[idx + 1]);
       b2 = parseInt(tokens[idx + 2]);
-      if (hasAlpha) a2 = parseFloat(tokens[idx + 3]);
+      if (hasAlpha) {
+        const a2raw = parseFloat(tokens[idx + 3]);
+        a2 = (a2raw <= 1 && tokens[idx + 3].includes('.')) ? Math.round(a2raw * 255) : Math.round(a2raw);
+      }
     }
 
     if (isNaN(value) || isNaN(r1) || isNaN(g1) || isNaN(b1) || (hasAlpha && isNaN(a1))) {
@@ -1656,17 +2200,16 @@ body {
       type,
       value,
       startColor,
-      alpha: hasAlpha ? a1 : 1,
+      alpha: hasAlpha ? a1 : 255,
       endColor,
-      endAlpha: isGradient && hasAlpha ? a2 : 1
+      endAlpha: isGradient && hasAlpha ? a2 : 255
     });
   }
 
   // ── Event Listeners ──
-  document.getElementById('rfColor').addEventListener('input', () => {
+  document.getElementById('rfColorHex').addEventListener('input', () => {
     updatePreview();
   });
-  document.getElementById('rfColor').addEventListener('change', saveState);
 
   ['product', 'units', 'scale', 'offset', 'step', 'filename'].forEach(id => {
     document.getElementById(id).addEventListener('change', saveState);
